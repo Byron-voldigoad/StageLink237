@@ -1,0 +1,299 @@
+<div class="min-h-screen bg-gray-50 py-6 sm:py-12">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">
+        {{ isEditMode ? "Modifier l'offre de stage" : "Créer une nouvelle offre de stage" }}
+      </h1>
+      <p class="mt-2 text-sm text-gray-600">
+        Remplissez les informations ci-dessous pour {{ isEditMode ? 'modifier' : 'créer' }} une offre de stage.
+      </p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" 
+         class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-sm">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="offreForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <!-- Main Info Section -->
+      <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="p-6 sm:p-8">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Informations principales</h2>
+          <div class="space-y-6">
+            <!-- Entreprise -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Entreprise <span class="text-red-500">*</span>
+              </label>
+              <select 
+                formControlName="id_entreprise"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                [ngClass]="{'border-red-300': offreForm.get('id_entreprise')?.invalid && offreForm.get('id_entreprise')?.touched}">
+                <option value="">Sélectionnez une entreprise</option>
+                <option *ngFor="let entreprise of entreprises" [value]="entreprise.id_entreprise">
+                  {{ entreprise.nom }}
+                </option>
+              </select>
+              <p *ngIf="offreForm.get('id_entreprise')?.invalid && offreForm.get('id_entreprise')?.touched" 
+                 class="mt-2 text-sm text-red-600">
+                L'entreprise est requise
+              </p>
+            </div>
+
+            <!-- Titre -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Titre <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                formControlName="titre"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                [ngClass]="{'border-red-300': offreForm.get('titre')?.invalid && offreForm.get('titre')?.touched}"
+                placeholder="Ex: Développeur Full Stack Angular/Laravel">
+              <p *ngIf="offreForm.get('titre')?.invalid && offreForm.get('titre')?.touched" 
+                 class="mt-2 text-sm text-red-600">
+                Le titre est requis
+              </p>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Description <span class="text-red-500">*</span>
+              </label>
+              <textarea 
+                formControlName="description"
+                rows="4"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                [ngClass]="{'border-red-300': offreForm.get('description')?.invalid && offreForm.get('description')?.touched}"
+                placeholder="Décrivez le stage et les missions principales..."></textarea>
+              <p *ngIf="offreForm.get('description')?.invalid && offreForm.get('description')?.touched" 
+                 class="mt-2 text-sm text-red-600">
+                La description est requise
+              </p>
+            </div>
+
+            <!-- Exigences -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Exigences
+              </label>
+              <textarea 
+                formControlName="exigences"
+                rows="4"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                placeholder="Listez les prérequis et exigences pour le stage..."></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compétences Section -->
+      <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="p-6 sm:p-8">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Compétences requises</h2>
+          
+          <!-- Selected Competences -->
+          <div class="mb-4">
+            <div class="flex flex-wrap gap-2" *ngIf="selectedCompetences.length > 0">
+              <div *ngFor="let comp of selectedCompetences" 
+                   class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                {{ comp }}
+                <button type="button" 
+                        (click)="removeCompetence(comp)"
+                        class="ml-2 text-red-600 hover:text-red-800 focus:outline-none">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Competences Selector -->
+          <div class="relative">
+            <select 
+              (change)="addCompetence($event)"
+              class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+              <option value="">Ajouter une compétence...</option>
+              <optgroup *ngFor="let group of competenceGroups" [label]="group.label">
+                <option *ngFor="let comp of group.competences" [value]="comp">
+                  {{ comp }}
+                </option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Section -->
+      <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+        <div class="p-6 sm:p-8">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">Détails du stage</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <!-- Durée -->
+            <div class="sm:col-span-2 grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Durée
+                </label>
+                <input 
+                  type="number" 
+                  formControlName="duree_nombre"
+                  min="1"
+                  class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                  placeholder="Ex: 6">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Unité
+                </label>
+                <select 
+                  formControlName="duree_unite"
+                  class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                  <option value="mois">Mois</option>
+                  <option value="semaines">Semaines</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Localisation -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Localisation
+              </label>
+              <select 
+                formControlName="localisation"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                <option value="">Sélectionnez une ville</option>
+                <option value="Douala">Douala</option>
+                <option value="Yaoundé">Yaoundé</option>
+                <option value="Bamenda">Bamenda</option>
+                <option value="Bafoussam">Bafoussam</option>
+                <option value="Kribi">Kribi</option>
+                <option value="Garoua">Garoua</option>
+                <option value="Maroua">Maroua</option>
+                <option value="Ngaoundéré">Ngaoundéré</option>
+                <option value="Bertoua">Bertoua</option>
+                <option value="Ebolowa">Ebolowa</option>
+                <option value="Kousséri">Kousséri</option>
+                <option value="Buea">Buea</option>
+                <option value="Edea">Edea</option>
+                <option value="Kumba">Kumba</option>
+                <option value="Limbé">Limbé</option>
+                <option value="Mbalmayo">Mbalmayo</option>
+                <option value="Meiganga">Meiganga</option>
+                <option value="Nkongsamba">Nkongsamba</option>
+                <option value="Sangmélima">Sangmélima</option>
+              </select>
+            </div>
+
+            <!-- Secteur -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Secteur
+              </label>
+              <select 
+                formControlName="secteur"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                <option value="">Sélectionnez un secteur</option>
+                <option value="developpement_web">Développement Web</option>
+                <option value="design_ui_ux">Design UI/UX</option>
+                <option value="data_science">Data Science</option>
+                <option value="cloud_computing">Cloud Computing</option>
+                <option value="developpement_mobile">Développement Mobile</option>
+                <option value="cybersecurite">Cybersécurité</option>
+                <option value="intelligence_artificielle">Intelligence Artificielle</option>
+                <option value="gestion_de_projet">Gestion de Projet</option>
+              </select>
+            </div>
+
+            <!-- Rémunération -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Rémunération (FCFA)
+              </label>
+              <input 
+                type="number" 
+                formControlName="remuneration"
+                min="0"
+                step="5000"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                placeholder="Ex: 50000">
+            </div>
+
+            <!-- Dates -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Date de début
+              </label>
+              <input 
+                type="date" 
+                formControlName="date_debut"
+                (change)="updateDateFin()"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Date de fin (calculée)
+              </label>
+              <input 
+                type="date" 
+                formControlName="date_fin"
+                readonly
+                class="block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm sm:text-sm cursor-not-allowed">
+            </div>
+
+            <!-- Statut -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Statut
+              </label>
+              <select 
+                formControlName="statut"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                <option value="en_attente">En attente</option>
+                <option value="ouvert">Ouvert</option>
+                <option value="ferme">Fermé</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex items-center justify-between pt-6">
+        <button 
+          type="button"
+          routerLink="/stages"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          Annuler
+        </button>
+        <button 
+          type="submit"
+          [disabled]="offreForm.invalid || loading"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{{ isEditMode ? "Mettre à jour" : "Créer l'offre" }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

@@ -1,0 +1,9 @@
+<div *ngIf="tutorat">
+  <h2>{{ tutorat.titre }}</h2>
+  <p>{{ tutorat.description }}</p>
+  <p>Domaine : {{ tutorat.domaine }}</p>
+  <p>Niveau : {{ tutorat.niveau }}</p>
+  <p>Dates : {{ tutorat.dateDebut | date }} - {{ tutorat.dateFin | date }}</p>
+  <p>Tuteur : {{ tutorat.tuteur }}</p>
+  <button (click)="postuler()">Postuler</button>
+</div>

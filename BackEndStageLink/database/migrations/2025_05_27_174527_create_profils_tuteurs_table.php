@@ -1,0 +1,43 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateProfilsTuteursTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('profils_tuteurs', function (Blueprint $table) {
+            $table->bigIncrements('id_tuteur');
+            $table->unsignedBigInteger('id_utilisateur');
+            $table->string('prenom', 255);
+            $table->string('nom', 255);
+            $table->string('telephone', 20)->nullable();
+            $table->text('adresse')->nullable();
+            $table->text('qualifications')->nullable();
+            $table->text('certifications')->nullable();
+            $table->integer('annees_experience')->nullable();
+            $table->decimal('tarif_horaire', 10, 2)->nullable();
+            $table->string('photo_profil', 255)->nullable();
+            $table->boolean('disponible')->default(true);
+            $table->decimal('note', 3, 2)->default(0);
+            $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('profils_tuteurs');
+    }
+}

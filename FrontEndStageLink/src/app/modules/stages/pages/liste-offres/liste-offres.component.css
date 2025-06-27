@@ -1,0 +1,23 @@
+:host {
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* S'assurer que les éléments ne dépassent pas de leur conteneur */
+* {
+  box-sizing: border-box;
+}
+
+/* Empêcher le débordement horizontal sur les petits écrans */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

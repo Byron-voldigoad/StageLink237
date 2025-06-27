@@ -1,0 +1,56 @@
+# Laravel Backend
+BackEndStageLink/.env
+BackEndStageLink/vendor/
+BackEndStageLink/node_modules/
+BackEndStageLink/storage/logs/*.log
+BackEndStageLink/storage/framework/cache/*
+BackEndStageLink/storage/framework/sessions/*
+BackEndStageLink/storage/framework/views/*
+BackEndStageLink/bootstrap/cache/*
+BackEndStageLink/.phpunit.result.cache
+BackEndStageLink/npm-debug.log
+BackEndStageLink/yarn-error.log
+
+# Angular Frontend
+FrontEndStageLink/node_modules/
+FrontEndStageLink/dist/
+FrontEndStageLink/.angular/
+FrontEndStageLink/.sass-cache/
+FrontEndStageLink/connect.lock
+FrontEndStageLink/coverage/
+FrontEndStageLink/libpeerconnection.log
+FrontEndStageLink/npm-debug.log
+FrontEndStageLink/yarn-error.log
+FrontEndStageLink/testem.log
+FrontEndStageLink/typings/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Database
+*.sql
+*.sqlite
+*.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local 

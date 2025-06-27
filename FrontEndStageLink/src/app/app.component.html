@@ -1,0 +1,30 @@
+<div class="min-h-screen">
+  <div class="flex h-screen">
+    <!-- Sidebar avec gestion responsive -->
+    <div [ngClass]="{'translate-x-0': sidebarOpen, '-translate-x-full': !sidebarOpen}" 
+         class="fixed md:relative md:translate-x-0 z-30 transition-transform duration-300 ease-in-out h-full bg-white shadow-lg">
+      <app-sidebar *ngIf="showSidebar"></app-sidebar>
+    </div>
+
+    <!-- Overlay pour fermer la sidebar sur mobile -->
+    <div *ngIf="sidebarOpen" 
+         (click)="toggleSidebar()"
+         class="fixed inset-0 bg-black/20 backdrop-blur-sm z-20 md:hidden">
+    </div>
+
+    <div class="flex flex-col flex-1 min-h-screen">
+      <app-navbar>
+        <!-- Bouton menu mobile -->
+        <button *ngIf="showSidebar" 
+                (click)="toggleSidebar()"
+                class="md:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
+          <span class="material-icons">menu</span>
+        </button>
+      </app-navbar>
+      <main class="flex-1 p-6 bg-gray-50 overflow-y-auto">
+        <router-outlet></router-outlet>
+      </main>
+      <app-footer></app-footer>
+    </div>
+  </div>
+</div>

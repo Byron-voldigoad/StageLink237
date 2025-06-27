@@ -1,0 +1,21 @@
+// core/layout/sidebar/sidebar.component.ts
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-sidebar',
+  imports: [RouterLink, CommonModule],
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css'],
+})
+export class SidebarComponent {
+  menuItems = [
+    { name: 'Dashboard', icon: 'dashboard', link: '/dashboard' },
+    { name: 'Offres de stage', icon: 'work', link: '/stages' },
+    { name: "Sujets d'examen", icon: 'book', link: '/sujets' },
+    { name: 'Tutorat', icon: 'school', link: '/tutorats' },
+    { name: 'Profil', icon: 'person', link: '/profil' },
+    // Ajoutez d'autres liens selon vos besoins
+  ];
+}

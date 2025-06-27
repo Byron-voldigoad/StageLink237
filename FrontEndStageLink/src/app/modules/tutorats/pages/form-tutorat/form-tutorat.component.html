@@ -1,0 +1,11 @@
+<h2>Créer / Modifier une offre de tutorat</h2>
+<form (ngSubmit)="onSubmit()">
+  <label>Titre : <input [(ngModel)]="tutorat.titre" name="titre" required></label><br>
+  <label>Description : <textarea [(ngModel)]="tutorat.description" name="description"></textarea></label><br>
+  <label>Domaine : <input [(ngModel)]="tutorat.domaine" name="domaine"></label><br>
+  <label>Niveau : <input [(ngModel)]="tutorat.niveau" name="niveau"></label><br>
+  <label>Date début : <input type="date" [(ngModel)]="tutorat.dateDebut" name="dateDebut"></label><br>
+  <label>Date fin : <input type="date" [(ngModel)]="tutorat.dateFin" name="dateFin"></label><br>
+  <label>Tuteur : <input [(ngModel)]="tutorat.tuteur" name="tuteur"></label><br>
+  <button type="submit">Enregistrer</button>
+</form>

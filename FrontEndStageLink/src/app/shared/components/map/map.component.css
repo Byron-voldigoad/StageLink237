@@ -1,0 +1,48 @@
+/* Styles de base pour le conteneur de la carte */
+.map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+/* Correction du bug d'affichage des tuiles */
+:host ::ng-deep .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa;
+}
+
+/* Correction du bug des marqueurs */
+:host ::ng-deep .leaflet-marker-icon,
+:host ::ng-deep .leaflet-marker-shadow,
+:host ::ng-deep .leaflet-marker-pane,
+:host ::ng-deep .leaflet-popup-pane,
+:host ::ng-deep .leaflet-tile-pane,
+:host ::ng-deep .leaflet-tile {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* Style pour les popups */
+:host ::ng-deep .leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem;
+}
+
+/* Style pour le contenu des popups */
+:host ::ng-deep .leaflet-popup-content {
+  margin: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+:host ::ng-deep .leaflet-popup-tip {
+  background: white;
+} 

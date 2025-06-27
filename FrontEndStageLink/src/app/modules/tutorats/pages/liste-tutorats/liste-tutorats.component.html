@@ -1,0 +1,7 @@
+<h2>Liste des offres de tutorat</h2>
+<ul>
+  <li *ngFor="let tutorat of tutorats">
+    <a [routerLink]="['/tutorats', tutorat.id]">{{ tutorat.titre }}</a> - {{ tutorat.domaine }}
+  </li>
+</ul>
+<a routerLink="/tutorats/nouveau">Créer une offre de tutorat</a>

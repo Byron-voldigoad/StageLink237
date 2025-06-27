@@ -1,0 +1,70 @@
+1------------------------------------------------------------------------
+src/
+├── app/
+│   ├── core/                        # Dossier pour les fonctionnalités centrales et partagées
+│   │   ├── layout/                  # Composants de mise en page
+│   │   │   ├── navbar/              # Barre de navigation principale (component)
+│   │   │   ├── footer/              # Pied de page (component)
+│   │   │   └── sidebar/             # Barre latérale (component)
+│   │   ├── models/                  # Interfaces et types TypeScript
+│   │   └── services/                # Services partagés
+│   ├── modules/                     # Modules fonctionnels de l'application
+│   │   ├── dashboard/               # component du tableau de bord (component)
+│   │   ├── etudiant/                # component pour la gestion des étudiants (components)
+│   │   ├── tuteur/                  # component pour la gestion des tuteurs (components)
+│   │   ├── entreprise/              # component pour la gestion des entreprises (components)
+│   │   └── etc(les autre modules necessaire) # Autres modules spécifiques selon les besoins
+└── assets/                          # Fichiers statiques (images, polices, etc.)
+--------------------------------------------------------------------------------
+
+2----------------------------------------------------------------------------
+src/
+├── app/
+│   ├── core/
+│   │   ├── auth/                   # Services et guards d'authentification
+│   │   ├── interceptors/           # Intercepteurs HTTP
+│   │   ├── layout/                 
+│   │   │   ├── navbar/             
+│   │   │   ├── footer/             
+│   │   │   └── sidebar/            
+│   │   ├── models/                 
+│   │   ├── services/               
+│   │   │   ├── api.service.ts      # Service API de base
+│   │   │   └── theme.service.ts    # Gestion du thème light/dark
+│   │   └── shared/                 # Composants partagés
+│   ├── modules/
+│   │   ├── dashboard/              
+│   │   │   ├── components/         # Composants spécifiques au dashboard
+│   │   │   │   ├── stats-cards/    # Cartes de statistiques
+│   │   │   │   ├── recent-activities/ # Activités récentes
+│   │   │   │   └── quick-actions/  # Actions rapides
+│   │   │   ├── pages/
+│   │   │   │   └── dashboard-home/ # Page principale du dashboard
+│   │   │   └── dashboard.module.ts
+│   │   ├── etudiant/               
+│   │   ├── tuteur/                 
+│   │   ├── entreprise/             
+│   │   ├── sujets-examen/          # Module pour les sujets d'examen
+│   │   └── ...
+├── assets/
+│   ├── images/
+│   ├── icons/
+│   └── styles/                     # Fichiers CSS supplémentaires
+├── environments/
+└── ...
+
+ng generate component modules/tuteur
+ng generate component modules/entreprise
+ng generate component modules/etudiant
+ng generate component modules/dashboard
+
+
+ng generate component dashboard/pages/dashboard-home
+ng generate component dashboard/components/stats-cards
+ng generate component dashboard/components/recent-activities
+ng generate component dashboard/components/quick-actions
+
+
+ng generate component core/layout/footer
+ng generate component core/layout/sidebar
+ng generate component core/layout/navbar

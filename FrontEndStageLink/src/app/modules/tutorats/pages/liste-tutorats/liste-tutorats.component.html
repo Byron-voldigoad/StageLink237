@@ -1,7 +1,108 @@
-<h2>Liste des offres de tutorat</h2>
-<ul>
-  <li *ngFor="let tutorat of tutorats">
-    <a [routerLink]="['/tutorats', tutorat.id]">{{ tutorat.titre }}</a> - {{ tutorat.domaine }}
-  </li>
-</ul>
-<a routerLink="/tutorats/nouveau">Créer une offre de tutorat</a>
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Offres de Tutorat</h1>
+          <p class="mt-2 text-gray-600">Découvrez les opportunités de tutorat disponibles</p>
+        </div>
+        <a routerLink="/tutorats/nouveau" 
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
+          <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Créer une offre
+        </a>
+      </div>
+    </div>
+
+
+
+
+    <!-- Filtres -->
+    <div class="bg-white shadow rounded-lg mb-8">
+      <div class="px-6 py-4">
+        <form [formGroup]="filterForm">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="text" formControlName="search" 
+                   (input)="onFilterChange()"
+                   class="px-3 py-2 border border-gray-300 rounded-md"
+                   placeholder="Rechercher...">
+            <select formControlName="domaine" 
+                    (change)="onFilterChange()"
+                    class="px-3 py-2 border border-gray-300 rounded-md">
+              <option value="">Tous les domaines</option>
+              <option *ngFor="let domaine of domaines" [value]="domaine.nom">{{ domaine.nom }}</option>
+            </select>
+            <select formControlName="niveau" 
+                    (change)="onFilterChange()"
+                    class="px-3 py-2 border border-gray-300 rounded-md">
+              <option value="">Tous les niveaux</option>
+              <option *ngFor="let niveau of niveaux" [value]="niveau.nom">{{ niveau.nom }}</option>
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Liste des tutorats -->
+    <div class="bg-white shadow overflow-hidden sm:rounded-md">
+      <div *ngIf="loading" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+
+      <ul *ngIf="!loading && tutorats.length > 0" class="divide-y divide-gray-200">
+        <li *ngFor="let tutorat of tutorats"
+            class="px-6 py-4 hover:bg-gray-50 cursor-pointer"
+            (click)="goToTutoratDetail(tutorat.id_tutorat)"
+            tabindex="0">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <h4 class="text-lg font-medium text-gray-900">
+                {{ tutorat.titre }}
+              </h4>
+              <p class="mt-1 text-sm text-gray-600">{{ tutorat.description }}</p>
+              <div class="mt-2 flex items-center text-sm text-gray-500 space-x-4">
+                <span>{{ tutorat.domaine }}</span>
+                <span>{{ tutorat.niveau }}</span>
+                <span>{{ formatPrice(tutorat.tarif_horaire) }}</span>
+                <span>{{ formatDate(tutorat.date_debut) }}</span>
+              </div>
+            </div>
+            <div class="ml-4">
+              <span [class]="'px-2 py-1 rounded-full text-xs font-medium ' + getStatutClass(tutorat.statut)">
+                {{ getStatutLabel(tutorat.statut) }}
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div *ngIf="!loading && tutorats.length === 0" class="text-center py-12">
+        <p class="text-gray-500">Aucune offre trouvée</p>
+      </div>
+    </div>
+
+    <!-- Pagination simplifiée -->
+    <div *ngIf="totalPages > 1" class="mt-8 flex justify-center">
+      <nav class="flex items-center space-x-2">
+        <button *ngIf="currentPage > 1" 
+                (click)="onPageChange(currentPage - 1)"
+                class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+          Précédent
+        </button>
+        
+        <span class="px-3 py-2 text-sm text-gray-700">
+          Page {{ currentPage }} sur {{ totalPages }}
+        </span>
+        
+        <button *ngIf="currentPage < totalPages" 
+                (click)="onPageChange(currentPage + 1)"
+                class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+          Suivant
+        </button>
+      </nav>
+    </div>
+  </div>
+</div>

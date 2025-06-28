@@ -17,6 +17,7 @@ class CreateRolesTable extends Migration
             $table->bigIncrements('id_role');
             $table->string('nom_role', 50)->unique();
             $table->text('description_role')->nullable();
+            $table->timestamps();
         });
     }
 

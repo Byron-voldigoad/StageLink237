@@ -36,7 +36,8 @@ class ProfilTuteur extends Model
 
     public function matieres()
     {
-        return $this->belongsToMany(Matiere::class, 'tuteur_matieres')
+        // Correction : clé étrangère tuteur_id, clé associée matiere_id
+        return $this->belongsToMany(Matiere::class, 'tuteur_matieres', 'tuteur_id', 'matiere_id')
                     ->withPivot('niveau');
     }
 
@@ -48,5 +49,13 @@ class ProfilTuteur extends Model
     public function evaluations()
     {
         return $this->hasMany(EvaluationTuteur::class, 'tuteur_id');
+    }
+
+    /**
+     * Langues parlées par le tuteur
+     */
+    public function langues()
+    {
+        return $this->belongsToMany(\App\Models\Langue::class, 'tuteur_langues', 'tuteur_id', 'langue_id');
     }
 }

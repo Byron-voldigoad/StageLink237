@@ -15,19 +15,21 @@ class CreateProfilsTuteursTable extends Migration
     {
         Schema::create('profils_tuteurs', function (Blueprint $table) {
             $table->bigIncrements('id_tuteur');
-            $table->unsignedBigInteger('id_utilisateur');
-            $table->string('prenom', 255);
-            $table->string('nom', 255);
-            $table->string('telephone', 20)->nullable();
+            $table->unsignedBigInteger('utilisateur_id');
+            $table->text('bio')->nullable();
+            $table->string('specialites', 255)->nullable();
+            $table->decimal('tarif_horaire', 10, 2)->nullable();
+            $table->integer('experience_annees')->nullable();
+            $table->string('diplomes', 255)->nullable();
+            $table->text('methodes_pedagogiques')->nullable();
             $table->text('adresse')->nullable();
             $table->text('qualifications')->nullable();
             $table->text('certifications')->nullable();
-            $table->integer('annees_experience')->nullable();
-            $table->decimal('tarif_horaire', 10, 2)->nullable();
             $table->string('photo_profil', 255)->nullable();
             $table->boolean('disponible')->default(true);
             $table->decimal('note', 3, 2)->default(0);
-            $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
+            $table->timestamps();
+            $table->foreign('utilisateur_id')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
         });
     }
 

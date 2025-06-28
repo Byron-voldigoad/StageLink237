@@ -4,20 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNiveauxTable extends Migration
+class CreateLanguesTable extends Migration
 {
     public function up()
     {
-        Schema::create('niveaux', function (Blueprint $table) {
-            $table->bigIncrements('id_niveau');
+        Schema::create('langues', function (Blueprint $table) {
+            $table->bigIncrements('id_langue');
             $table->string('nom', 100);
-            $table->text('description')->nullable();
+            $table->string('code', 10)->nullable();
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('niveaux');
+        Schema::dropIfExists('langues');
     }
 }

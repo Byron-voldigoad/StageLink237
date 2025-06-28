@@ -12,6 +12,7 @@ class CreateMatieresTable extends Migration
             $table->bigIncrements('id_matiere');
             $table->string('nom', 255);
             $table->text('description')->nullable();
+            $table->timestamps();
         });
     }
 

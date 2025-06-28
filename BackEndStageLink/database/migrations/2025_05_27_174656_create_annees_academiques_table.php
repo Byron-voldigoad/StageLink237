@@ -18,6 +18,8 @@ class CreateAnneesAcademiquesTable extends Migration
             $table->integer('annee_debut');
             $table->integer('annee_fin');
             $table->text('description')->nullable();
+            $table->boolean('active')->default(false);
+            $table->timestamps();
         });
     }
 

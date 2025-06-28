@@ -1,0 +1,30 @@
+/* Styles pour le formulaire de tutorat */
+
+.langues-autocomplete {
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .mat-form-field, .langues-autocomplete, .mat-chip-list {
+    width: 100% !important;
+    min-width: 0;
+    font-size: 15px;
+  }
+  .mat-chip {
+    font-size: 13px;
+    height: 28px;
+  }
+  .space-y-6 > * + * {
+    margin-top: 1.25rem !important;
+  }
+  .p-6 {
+    padding: 1rem !important;
+  }
+  .text-3xl {
+    font-size: 1.5rem !important;
+  }
+  .block, .w-full {
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+}

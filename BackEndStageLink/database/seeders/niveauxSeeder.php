@@ -5,45 +5,41 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Niveau;
 
-class NiveauxSeeder extends Seeder
+class niveauxSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
         $niveaux = [
-            [
-                'nom' => 'Licence 1',
-                'description' => 'Première année de licence'
-            ],
-            [
-                'nom' => 'Licence 2',
-                'description' => 'Deuxième année de licence'
-            ],
-            [
-                'nom' => 'Licence 3',
-                'description' => 'Troisième année de licence'
-            ],
-            [
-                'nom' => 'Master 1',
-                'description' => 'Première année de master'
-            ],
-            [
-                'nom' => 'Master 2',
-                'description' => 'Deuxième année de master'
-            ],
-            [
-                'nom' => 'Doctorat',
-                'description' => 'Doctorat'
-            ],
-            [
-                'nom' => 'BTS',
-                'description' => 'Brevet de Technicien Supérieur'
-            ],
-            [
-                'nom' => 'DUT',
-                'description' => 'Diplôme Universitaire de Technologie'
-            ]
+            '6ème',
+            '5ème',
+            '4ème',
+            '3ème',
+            'Seconde',
+            'Première',
+            'Terminale',
+            'Bac',
+            'Bac+1',
+            'Bac+2',
+            'Bac+3',
+            'Bac+4',
+            'Bac+5',
+            'Master 1',
+            'Master 2',
+            'Doctorat'
         ];
 
-        Niveau::insert($niveaux);
+        foreach ($niveaux as $niveau) {
+            Niveau::create([
+                'nom' => $niveau,
+                'description' => 'Niveau ' . $niveau
+            ]);
+        }
+
+        $this->command->info('Niveaux créés avec succès !');
     }
 }

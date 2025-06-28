@@ -9,11 +9,12 @@ class CreateUtilisateurRolesTable extends Migration
     public function up()
     {
         Schema::create('utilisateur_roles', function (Blueprint $table) {
-            $table->unsignedBigInteger('id_utilisateur');
-            $table->unsignedBigInteger('id_role');
-            $table->primary(['id_utilisateur', 'id_role']);
-            $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
-            $table->foreign('id_role')->references('id_role')->on('roles')->onDelete('cascade');
+            $table->unsignedBigInteger('utilisateur_id');
+            $table->unsignedBigInteger('role_id');
+            $table->primary(['utilisateur_id', 'role_id']);
+            $table->timestamps();
+            $table->foreign('utilisateur_id')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
+            $table->foreign('role_id')->references('id_role')->on('roles')->onDelete('cascade');
         });
     }
 

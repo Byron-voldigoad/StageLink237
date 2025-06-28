@@ -9,6 +9,8 @@ use App\Http\Controllers\TypeSujetController;
 use App\Http\Controllers\MatiereController;
 use App\Http\Controllers\NiveauController;
 use App\Http\Controllers\AnneeAcademiqueController;
+use App\Http\Controllers\TutoratController;
+use App\Http\Controllers\LangueController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +53,11 @@ Route::apiResources([
     'notifications' => 'App\Http\Controllers\NotificationController',
     'evaluations-tuteurs' => 'App\Http\Controllers\EvaluationTuteurController',
     'soumissions-etudiants' => 'App\Http\Controllers\SoumissionEtudiantController',
+    'tutorats' => 'App\Http\Controllers\TutoratController',
 ]);
+
+// Routes pour les langues
+Route::get('langues', [LangueController::class, 'index']);
 
 // Routes pour les entreprises
 Route::apiResource('entreprises', EntrepriseController::class);
@@ -63,3 +69,17 @@ Route::resource('sujets-examen', SujetExamenController::class);
 Route::resource('types-sujets', TypeSujetController::class)->only(['index']);
 
 Route::post('/sujets-examen/upload', [SujetExamenController::class, 'uploadFile']);
+
+// Routes pour les tutorats
+Route::prefix('tutorats')->group(function () {
+    Route::get('/', [TutoratController::class, 'index']);
+    Route::post('/', [TutoratController::class, 'store']);
+    Route::get('/{id}', [TutoratController::class, 'show']);
+    Route::put('/{id}', [TutoratController::class, 'update']);
+    Route::delete('/{id}', [TutoratController::class, 'destroy']);
+    Route::post('/{id}/postuler', [TutoratController::class, 'postuler']);
+    Route::put('/{tutoratId}/candidatures/{candidatureId}', [TutoratController::class, 'gererCandidature']);
+    Route::get('/statistiques', [TutoratController::class, 'statistiques']);
+    Route::get('/domaines', [TutoratController::class, 'domaines']);
+    Route::get('/niveaux', [TutoratController::class, 'niveaux']);
+});

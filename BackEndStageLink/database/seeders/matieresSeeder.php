@@ -5,53 +5,45 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Matiere;
 
-class MatieresSeeder extends Seeder
+class matieresSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
         $matieres = [
-            [
-                'nom' => 'Mathématiques',
-                'description' => 'Mathématiques générales'
-            ],
-            [
-                'nom' => 'Physique',
-                'description' => 'Physique générale'
-            ],
-            [
-                'nom' => 'Chimie',
-                'description' => 'Chimie générale'
-            ],
-            [
-                'nom' => 'Français',
-                'description' => 'Français et littérature'
-            ],
-            [
-                'nom' => 'Anglais',
-                'description' => 'Anglais'
-            ],
-            [
-                'nom' => 'Informatique',
-                'description' => 'Informatique générale'
-            ],
-            [
-                'nom' => 'Histoire',
-                'description' => 'Histoire'
-            ],
-            [
-                'nom' => 'Géographie',
-                'description' => 'Géographie'
-            ],
-            [
-                'nom' => 'Philosophie',
-                'description' => 'Philosophie'
-            ],
-            [
-                'nom' => 'Économie',
-                'description' => 'Économie générale'
-            ]
+            'Mathématiques',
+            'Physique',
+            'Chimie',
+            'Biologie',
+            'Informatique',
+            'Anglais',
+            'Français',
+            'Histoire',
+            'Géographie',
+            'Philosophie',
+            'Économie',
+            'Droit',
+            'Médecine',
+            'Ingénierie',
+            'Arts',
+            'Sciences Politiques',
+            'Psychologie',
+            'Sociologie',
+            'Langues Étrangères',
+            'Sciences de l\'Ingénieur'
         ];
 
-        Matiere::insert($matieres);
+        foreach ($matieres as $matiere) {
+            Matiere::create([
+                'nom' => $matiere,
+                'description' => 'Description de la matière ' . $matiere
+            ]);
+        }
+
+        $this->command->info('Matières créées avec succès !');
     }
 }

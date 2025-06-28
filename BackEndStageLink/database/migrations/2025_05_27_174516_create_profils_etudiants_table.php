@@ -15,20 +15,17 @@ class CreateProfilsEtudiantsTable extends Migration
     {
         Schema::create('profils_etudiants', function (Blueprint $table) {
             $table->bigIncrements('id_etudiant');
-            $table->unsignedBigInteger('id_utilisateur');
-            $table->string('prenom', 255);
-            $table->string('nom', 255);
-            $table->string('telephone', 20)->nullable();
+            $table->unsignedBigInteger('utilisateur_id');
+            $table->string('niveau_etude', 100)->nullable();
+            $table->string('etablissement', 255)->nullable();
+            $table->string('specialite', 255)->nullable();
+            $table->text('objectifs')->nullable();
             $table->text('adresse')->nullable();
-            $table->string('ecole', 255)->nullable();
-            $table->string('niveau', 100)->nullable();
-            $table->string('domaine_etude', 255)->nullable();
             $table->string('cv_path', 255)->nullable();
             $table->string('photo_profil', 255)->nullable();
             $table->decimal('credits', 10, 2)->default(0);
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-            $table->foreign('id_utilisateur')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
+            $table->timestamps();
+            $table->foreign('utilisateur_id')->references('id_utilisateur')->on('utilisateurs')->onDelete('cascade');
         });
     }
 

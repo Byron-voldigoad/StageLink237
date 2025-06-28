@@ -15,11 +15,12 @@ class CreateTuteurMatieresTable extends Migration
     {
         Schema::create('tuteur_matieres', function (Blueprint $table) {
             $table->bigIncrements('id_tuteur_matiere');
-            $table->unsignedBigInteger('id_tuteur');
-            $table->unsignedBigInteger('id_matiere');
+            $table->unsignedBigInteger('tuteur_id');
+            $table->unsignedBigInteger('matiere_id');
             $table->string('niveau', 100);
-            $table->foreign('id_tuteur')->references('id_tuteur')->on('profils_tuteurs')->onDelete('cascade');
-            $table->foreign('id_matiere')->references('id_matiere')->on('matieres')->onDelete('cascade');
+            $table->timestamps();
+            $table->foreign('tuteur_id')->references('id_tuteur')->on('profils_tuteurs')->onDelete('cascade');
+            $table->foreign('matiere_id')->references('id_matiere')->on('matieres')->onDelete('cascade');
         });
     }
 

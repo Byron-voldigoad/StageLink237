@@ -16,7 +16,7 @@ class CreateTypesSujetsTable extends Migration
         Schema::create('types_sujets', function (Blueprint $table) {
             $table->bigIncrements('id_type');
             $table->string('nom', 100);
-            $table->string('description')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

@@ -25,7 +25,8 @@ class Matiere extends Model
 
     public function tuteurs()
     {
-        return $this->belongsToMany(ProfilTuteur::class, 'tuteur_matieres')
+        // Correction : clé étrangère matiere_id, clé associée tuteur_id
+        return $this->belongsToMany(ProfilTuteur::class, 'tuteur_matieres', 'matiere_id', 'tuteur_id')
                     ->withPivot('niveau');
     }
 

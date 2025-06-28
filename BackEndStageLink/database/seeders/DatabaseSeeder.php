@@ -22,11 +22,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             matieresSeeder::class,
-            niveauxSeeder::class,
+            NiveauxSeeder::class,
+            LangueSeeder::class,
             anneesAcademiquesSeeder::class,
             TypesSujetsSeeder::class,
             CorrigesExamenSeeder::class,
             SujetsExamenSeeder::class,
+            ProfilsSeeder::class,
+            TutoratSeeder::class,
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
@@ -383,24 +386,6 @@ class DatabaseSeeder extends Seeder
             OffreStage::create($offreData);
         }
 
-        // Création des profils étudiants
-        $profilsEtudiants = [
-            [
-                'id_utilisateur' => 3,
-                'prenom' => 'Jane',
-                'nom' => 'Smith',
-                'telephone' => '0123456789',
-                'adresse' => '123 Rue des Étudiants',
-                'ecole' => 'École Supérieure d\'Informatique',
-                'niveau' => 'Master',
-                'domaine_etude' => 'Informatique',
-                'credits' => 0
-            ]
-        ];
-
-        foreach ($profilsEtudiants as $profilData) {
-            ProfilEtudiant::create($profilData);
-        }
 
         // Création des messages
         $messages = [

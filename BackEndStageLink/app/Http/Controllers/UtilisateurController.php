@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Utilisateur;
+use App\Models\ProfilTuteur;
 use Illuminate\Http\Request;
 
 class UtilisateurController extends Controller
@@ -20,24 +21,48 @@ class UtilisateurController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'email' => 'required|email|unique:utilisateurs',
-            'password' => 'required|min:8',
-            'role' => 'required|in:admin,etudiant,tuteur,entreprise'
-        ]);
+        try {
+            $data = $request->all();
+            \Log::info('Données reçues pour inscription utilisateur', $data);
+            $validated = validator($data, [
+                'email' => 'required|email|unique:utilisateurs',
+                'password' => 'required|string|min:8',
+                'nom' => 'required|string|max:100',
+                'prenom' => 'required|string|max:100',
+                'role' => 'required|in:admin,etudiant,tuteur,entreprise'
+            ])->validate();
 
-        $user = Utilisateur::create([
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password'])
-        ]);
+            $user = Utilisateur::create([
+                'nom' => $validated['nom'],
+                'prenom' => $validated['prenom'],
+                'email' => $validated['email'],
+                'mot_de_passe' => bcrypt($validated['password'])
+            ]);
 
-        // Assigner le rôle
-        $role = \App\Models\Role::where('nom', $validated['role'])->first();
-        if ($role) {
-            $user->roles()->attach($role);
+            // Assigner le rôle
+            $role = \App\Models\Role::where('nom_role', $validated['role'])->first();
+            if ($role) {
+                $user->roles()->attach($role, ['created_at' => now(), 'updated_at' => now()]);
+            }
+
+            // Si tuteur, gérer l'upload du justificatif et créer le profil tuteur
+            if ($validated['role'] === 'tuteur') {
+                $diplomePath = null;
+                if ($request->hasFile('justificatif')) {
+                    $diplomePath = $request->file('justificatif')->store('justificatifs', 'public');
+                }
+                ProfilTuteur::create([
+                    'utilisateur_id' => $user->id_utilisateur,
+                    'diplomes' => $diplomePath,
+                ]);
+            }
+
+            return response()->json($user->load('roles'), 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['errors' => $e->errors(), 'message' => 'Validation failed', 'debug' => $data], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage(), 'debug' => $data], 500);
         }
-
-        return response()->json($user->load('roles'), 201);
     }
 
     /**

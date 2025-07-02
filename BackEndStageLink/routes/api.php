@@ -90,3 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/niveaux', [TutoratController::class, 'niveaux']);
     });
 });
+
+// Route publique pour l'inscription utilisateur
+Route::post('utilisateurs', [App\Http\Controllers\UtilisateurController::class, 'store']);

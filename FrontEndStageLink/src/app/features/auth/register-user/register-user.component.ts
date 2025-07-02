@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register-user',
@@ -22,6 +24,8 @@ export class RegisterUserComponent {
 
   // Champs enseignant
   justificatif: File | null = null;
+
+  constructor(private authService: AuthService, private router: Router) {}
 
   onFileChange(event: any) {
     if (event.target.files && event.target.files.length > 0) {
@@ -47,10 +51,28 @@ export class RegisterUserComponent {
     this.loading = true;
     this.error = '';
     this.success = '';
-    // Simulation d'inscription (à remplacer par votre logique)
-    setTimeout(() => {
-      this.loading = false;
-      this.success = 'Inscription réussie ! Vous pouvez maintenant vous connecter.';
-    }, 2000);
+
+    // Préparation des données à envoyer
+    const formData = new FormData();
+    formData.append('prenom', this.prenom);
+    formData.append('nom', this.nom);
+    formData.append('email', this.email);
+    formData.append('password', this.password);
+    formData.append('role', this.type === 'enseignant' ? 'tuteur' : 'etudiant');
+    if (this.type === 'enseignant' && this.justificatif) {
+      formData.append('justificatif', this.justificatif);
+    }
+
+    this.authService.registerUser(formData).subscribe({
+      next: () => {
+        this.loading = false;
+        this.success = 'Inscription réussie ! Vous pouvez maintenant vous connecter.';
+        setTimeout(() => this.router.navigate(['/login']), 2000);
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = err.error?.message || 'Erreur lors de l\'inscription.';
+      }
+    });
   }
 } 

@@ -18,6 +18,8 @@ class Utilisateur extends Authenticatable
     protected $keyType = 'int';
 
     protected $fillable = [
+        'nom',
+        'prenom',
         'email',
         'mot_de_passe',
         'email_verified_at',
@@ -35,7 +37,7 @@ class Utilisateur extends Authenticatable
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'utilisateur_roles', 'id_utilisateur', 'id_role');
+        return $this->belongsToMany(Role::class, 'utilisateur_roles', 'utilisateur_id', 'role_id');
     }
 
     public function profilEtudiant()

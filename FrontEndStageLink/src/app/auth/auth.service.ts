@@ -52,4 +52,8 @@ export class AuthService {
   getUser(): any {
     return this.userSubject.value;
   }
+
+  registerUser(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/utilisateurs`, data);
+  }
 }

@@ -15,15 +15,16 @@ class ProfilTuteur extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'id_utilisateur',
-        'prenom',
-        'nom',
-        'telephone',
+        'utilisateur_id',
+        'bio',
+        'specialites',
+        'tarif_horaire',
+        'experience_annees',
+        'diplomes',
+        'methodes_pedagogiques',
         'adresse',
         'qualifications',
         'certifications',
-        'annees_experience',
-        'tarif_horaire',
         'photo_profil',
         'disponible',
         'note'

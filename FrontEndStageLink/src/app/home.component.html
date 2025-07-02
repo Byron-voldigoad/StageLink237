@@ -1,0 +1,265 @@
+<div class="scroll-pt-24">
+<!-- HEADER/NAVBAR -->
+<header class="sticky top-0 z-50 bg-white shadow transition-shadow duration-200">
+  <nav class="container max-w-7xl mx-auto flex items-center justify-between py-4 px-4 md:px-8">
+    <div class="flex items-center gap-3">
+      <div class="bg-gradient-to-br from-red-600 to-red-700 rounded-xl w-8 h-8 flex items-center justify-center">
+        <span class="text-white font-extrabold text-xl">S</span>
+      </div>
+      <span class="text-2xl font-bold tracking-tight">
+        <span class="text-gray-900">Stage</span><span class="text-red-600">Link</span>
+      </span>
+    </div>
+    <ul class="hidden md:flex gap-8 text-gray-700 font-medium text-lg">
+      <li><a href="#home" class="hover:text-red-600 transition-colors duration-200">Accueil</a></li>
+      <li><a href="#services" class="hover:text-red-600 transition-colors duration-200">Services</a></li>
+      <li><a href="#about" class="hover:text-red-600 transition-colors duration-200">À propos</a></li>
+      <li><a href="#contact" class="hover:text-red-600 transition-colors duration-200">Contact</a></li>
+    </ul>
+    <button (click)="goToLogin()" class="ml-6 px-6 py-2 rounded-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold shadow hover:from-red-700 hover:to-orange-700 transition-all duration-200 text-lg hidden md:inline-block">
+      Se connecter
+    </button>
+    <button class="md:hidden flex flex-col gap-1 group" (click)="mobileMenuOpen = !mobileMenuOpen" aria-label="Ouvrir le menu">
+      <span class="block w-7 h-1 bg-gray-700 rounded transition-all duration-200" [ngClass]="{'rotate-45 translate-y-2': mobileMenuOpen}"></span>
+      <span class="block w-7 h-1 bg-gray-700 rounded transition-all duration-200" [ngClass]="{'opacity-0': mobileMenuOpen}"></span>
+      <span class="block w-7 h-1 bg-gray-700 rounded transition-all duration-200" [ngClass]="{'-rotate-45 -translate-y-2': mobileMenuOpen}"></span>
+    </button>
+  </nav>
+  <div *ngIf="mobileMenuOpen" class="md:hidden bg-white shadow-lg absolute w-full left-0 top-full animate-fadeIn">
+    <ul class="flex flex-col gap-4 py-6 px-8 text-lg font-medium text-gray-700">
+      <li><a href="#home" (click)="mobileMenuOpen = false" class="hover:text-red-600 transition">Accueil</a></li>
+      <li><a href="#services" (click)="mobileMenuOpen = false" class="hover:text-red-600 transition">Services</a></li>
+      <li><a href="#about" (click)="mobileMenuOpen = false" class="hover:text-red-600 transition">À propos</a></li>
+      <li><a href="#contact" (click)="mobileMenuOpen = false" class="hover:text-red-600 transition">Contact</a></li>
+      <li>
+        <button (click)="goToLogin(); mobileMenuOpen = false" class="w-full px-6 py-2 rounded-full bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold shadow hover:from-red-700 hover:to-orange-700 transition-all duration-200 text-lg mt-2">
+          Se connecter
+        </button>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<!-- HERO SECTION -->
+<section id="home" class="relative overflow-hidden py-20 md:py-32 bg-gradient-to-br from-red-50 via-white to-blue-50 flex flex-col items-center text-center">
+  <!-- Cercles décoratifs -->
+  <div class="absolute right-0 top-0 w-64 h-64 bg-gradient-to-br from-red-400 via-orange-300 to-transparent rounded-full blur-3xl opacity-40 animate-pulse-slow pointer-events-none"></div>
+  <div class="absolute left-0 bottom-0 w-72 h-72 bg-gradient-to-tr from-blue-400 via-red-300 to-transparent rounded-full blur-3xl opacity-40 animate-pulse-slow pointer-events-none"></div>
+  <!-- Badge -->
+  <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-red-100 text-red-800 font-semibold text-sm mb-6 animate-fadeInDown">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+    Plateforme innovante pour étudiants
+  </div>
+  <!-- Titre principal -->
+  <h1 class="text-4xl md:text-6xl font-extrabold mb-4 text-gray-900 animate-fadeInUp">Votre succès commence <br><span class="bg-gradient-to-r from-red-600 via-orange-600 to-red-600 bg-clip-text text-transparent">avec StageLink</span></h1>
+  <!-- Sous-titre -->
+  <p class="text-lg md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fadeInUp delay-100">La plateforme qui révolutionne votre parcours étudiant : stages sur-mesure, tutorat d'excellence et suivi personnalisé dans un environnement moderne et bienveillant.</p>
+  <!-- CTA -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-10 animate-fadeInUp delay-200">
+    <a href="#contact" class="px-8 py-3 rounded-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-200 text-lg">Commencer maintenant</a>
+    <a href="#services" class="px-8 py-3 rounded-full border-2 border-blue-600 text-blue-600 font-semibold hover:bg-blue-600 hover:text-white transition-all duration-200 text-lg">Découvrir nos services</a>
+  </div>
+  <!-- Statistiques -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-8 w-full max-w-3xl animate-fadeInUp delay-300">
+    <div class="flex flex-col items-center">
+      <span class="text-4xl font-extrabold text-red-600">1000+</span>
+      <span class="text-gray-700 mt-1">Étudiants accompagnés</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span class="text-4xl font-extrabold text-blue-600">500+</span>
+      <span class="text-gray-700 mt-1">Stages proposés</span>
+    </div>
+    <div class="flex flex-col items-center">
+      <span class="text-4xl font-extrabold text-orange-600">95%</span>
+      <span class="text-gray-700 mt-1">Taux de satisfaction</span>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section id="about" class="py-20 md:py-28 bg-white">
+  <div class="container max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-16 px-4 md:px-8">
+    <div class="flex-1 space-y-6">
+      <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-blue-100 text-blue-800 font-semibold text-sm mb-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 010 6.364l-1.06 1.06a4.5 4.5 0 006.364 6.364l1.06-1.06a4.5 4.5 0 016.364-6.364l1.06-1.06a4.5 4.5 0 00-6.364-6.364l-1.06 1.06a4.5 4.5 0 01-6.364 0z" /></svg>
+        À propos de StageLink
+      </div>
+      <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">L'innovation au service de <span class="text-red-600">votre réussite</span></h2>
+      <p class="text-gray-600 text-lg leading-relaxed">StageLink est une plateforme innovante dédiée à la réussite des étudiants et à la collaboration avec les entreprises. Nous facilitons la recherche de stages, le tutorat universitaire et le suivi personnalisé, dans une ambiance conviviale et professionnelle.</p>
+      <div class="flex flex-col sm:flex-row gap-6 mt-6">
+        <div class="flex items-center gap-4 bg-red-50 rounded-xl px-5 py-4 shadow-sm">
+          <div class="bg-gradient-to-br from-red-600 to-orange-500 w-12 h-12 flex items-center justify-center rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" /></svg>
+          </div>
+          <div>
+            <div class="font-bold text-gray-900">Mission claire</div>
+            <div class="text-gray-600 text-sm">Connecter les talents de demain avec les opportunités d'aujourd'hui</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4 bg-blue-50 rounded-xl px-5 py-4 shadow-sm">
+          <div class="bg-gradient-to-br from-blue-600 to-blue-400 w-12 h-12 flex items-center justify-center rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M17 8V6a4 4 0 00-8 0v2m8 0a4 4 0 01-8 0m8 0v2a4 4 0 01-8 0V8" /></svg>
+          </div>
+          <div>
+            <div class="font-bold text-gray-900">Communauté engagée</div>
+            <div class="text-gray-600 text-sm">Une équipe de tuteurs passionnés et d'entreprises partenaires</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex-1 flex flex-col items-center relative">
+      <div class="relative w-64 h-64 bg-gradient-to-br from-red-100 via-orange-50 to-blue-100 rounded-3xl flex flex-col items-center justify-center shadow-lg">
+        <div class="absolute -top-6 -left-6 w-16 h-16 bg-gradient-to-br from-red-400 to-orange-300 rounded-full blur-2xl opacity-40"></div>
+        <div class="absolute -bottom-6 -right-6 w-20 h-20 bg-gradient-to-tr from-blue-400 to-red-300 rounded-full blur-2xl opacity-40"></div>
+        <div class="bg-gradient-to-br from-red-600 to-red-700 rounded-xl w-16 h-16 flex items-center justify-center mb-4">
+          <span class="text-white font-extrabold text-3xl">SL</span>
+        </div>
+        <div class="flex gap-8 mt-2">
+          <div class="flex flex-col items-center">
+            <span class="text-lg font-bold text-orange-600">24/7</span>
+            <span class="text-gray-600 text-xs">Support disponible</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <span class="text-lg font-bold text-blue-600">100%</span>
+            <span class="text-gray-600 text-xs">Personnalisé</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES SECTION -->
+<section id="services" class="py-20 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+  <div class="container max-w-7xl mx-auto px-4 md:px-8">
+    <div class="flex flex-col items-center mb-12">
+      <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-red-100 text-red-800 font-semibold text-sm mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C7.67 7.165 6 9.388 6 12v2.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+        Nos Services
+      </div>
+      <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 text-center">Des solutions adaptées à <span class="text-red-600">vos besoins</span></h2>
+      <p class="text-gray-600 text-lg mt-4 text-center max-w-2xl">Découvrez notre gamme complète de services conçus pour vous accompagner à chaque étape de votre parcours étudiant et professionnel.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+      <!-- Carte 1 -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group">
+        <div class="bg-gradient-to-br from-red-600 to-orange-500 w-16 h-16 flex items-center justify-center rounded-xl mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        </div>
+        <h3 class="font-bold text-xl mb-2 group-hover:text-red-600 transition-colors">Recherche de stages</h3>
+        <p class="text-gray-600 text-center mb-4">Trouvez et postulez à des offres de stage adaptées à votre profil, en toute simplicité.</p>
+        <a href="#" class="inline-flex items-center gap-1 text-red-600 font-semibold hover:underline transition">En savoir plus <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></a>
+      </div>
+      <!-- Carte 2 -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group">
+        <div class="bg-gradient-to-br from-blue-600 to-blue-400 w-16 h-16 flex items-center justify-center rounded-xl mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m0 0l-7-4m7 4l7-4" /></svg>
+        </div>
+        <h3 class="font-bold text-xl mb-2 group-hover:text-blue-600 transition-colors">Tutorat universitaire</h3>
+        <p class="text-gray-600 text-center mb-4">Bénéficiez d'un accompagnement personnalisé par des tuteurs expérimentés et passionnés.</p>
+        <a href="#" class="inline-flex items-center gap-1 text-blue-600 font-semibold hover:underline transition">En savoir plus <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></a>
+      </div>
+      <!-- Carte 3 -->
+      <div class="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl group">
+        <div class="bg-gradient-to-br from-orange-500 to-red-400 w-16 h-16 flex items-center justify-center rounded-xl mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v8z" /></svg>
+        </div>
+        <h3 class="font-bold text-xl mb-2 group-hover:text-orange-600 transition-colors">Messagerie & Suivi</h3>
+        <p class="text-gray-600 text-center mb-4">Discutez, suivez vos candidatures et recevez des notifications en temps réel.</p>
+        <a href="#" class="inline-flex items-center gap-1 text-orange-600 font-semibold hover:underline transition">En savoir plus <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT SECTION -->
+<section id="contact" class="py-20 bg-gradient-to-br from-red-50 via-orange-50 to-white">
+  <div class="container max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row gap-16 items-center">
+    <!-- Formulaire -->
+    <form class="flex-1 bg-gradient-to-br from-red-50 via-orange-50 to-white rounded-2xl shadow-lg p-8 flex flex-col gap-4 animate-fadeInUp">
+      <input type="text" placeholder="Nom complet" class="rounded-full px-5 py-3 border border-red-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-lg transition" />
+      <input type="email" placeholder="Adresse email" class="rounded-full px-5 py-3 border border-red-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-lg transition" />
+      <textarea placeholder="Message" rows="4" class="rounded-2xl px-5 py-3 border border-red-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-100 outline-none text-lg transition"></textarea>
+      <button type="submit" class="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold rounded-full px-8 py-3 text-lg shadow transition-transform transform hover:scale-105 duration-200 w-full">Envoyer le message</button>
+    </form>
+    <!-- Infos contact -->
+    <div class="flex-1 flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-4">
+          <div class="bg-gradient-to-br from-red-600 to-red-400 w-12 h-12 flex items-center justify-center rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+          </div>
+          <div>
+            <div class="font-bold text-gray-900">Email</div>
+            <div class="text-gray-600 text-sm">contact&#64;stagelink.fr</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="bg-gradient-to-br from-blue-600 to-blue-400 w-12 h-12 flex items-center justify-center rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h2l.4 2M7 13h10l4-8H5.4M7 13l-1.35 2.7A2 2 0 008.48 19h7.04a2 2 0 001.83-1.3L17 13M7 13V6a1 1 0 011-1h5a1 1 0 011 1v7" /></svg>
+          </div>
+          <div>
+            <div class="font-bold text-gray-900">Téléphone</div>
+            <div class="text-gray-600 text-sm">+33 1 23 45 67 89</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="bg-gradient-to-br from-orange-500 to-red-400 w-12 h-12 flex items-center justify-center rounded-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 12.414a8 8 0 111.414-1.414l4.243 4.243a1 1 0 01-1.414 1.414z" /></svg>
+          </div>
+          <div>
+            <div class="font-bold text-gray-900">Adresse</div>
+            <div class="text-gray-600 text-sm">Paris, France</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-4 mt-4">
+        <a href="#" class="bg-gradient-to-br from-blue-600 to-blue-400 text-white rounded-full p-3 hover:scale-110 transition"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8a6 6 0 01-12 0 6 6 0 0112 0z" /></svg></a>
+        <a href="#" class="bg-gradient-to-br from-red-600 to-orange-500 text-white rounded-full p-3 hover:scale-110 transition"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0022.43.36a9.09 9.09 0 01-2.88 1.1A4.52 4.52 0 0016.11 0c-2.5 0-4.52 2.02-4.52 4.52 0 .35.04.7.11 1.03A12.94 12.94 0 013 1.1a4.52 4.52 0 001.4 6.03A4.48 4.48 0 012.8 6.7v.06c0 2.18 1.55 4 3.8 4.42a4.52 4.52 0 01-2.04.08c.57 1.78 2.23 3.08 4.2 3.12A9.05 9.05 0 012 19.54a12.8 12.8 0 006.95 2.04c8.34 0 12.9-6.91 12.9-12.9 0-.2 0-.39-.01-.58A9.22 9.22 0 0024 4.59a9.1 9.1 0 01-2.6.71z" /></svg></a>
+        <a href="#" class="bg-gradient-to-br from-gray-900 to-gray-700 text-white rounded-full p-3 hover:scale-110 transition"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12c0 4.84 3.44 8.87 8 9.8.59.11.8-.26.8-.58v-2.02c-3.25.71-3.93-1.56-3.93-1.56-.54-1.37-1.32-1.74-1.32-1.74-1.08-.74.08-.73.08-.73 1.2.08 1.83 1.23 1.83 1.23 1.06 1.82 2.78 1.3 3.46.99.11-.77.42-1.3.76-1.6-2.6-.3-5.34-1.3-5.34-5.8 0-1.28.46-2.33 1.22-3.15-.12-.3-.53-1.52.12-3.17 0 0 .99-.32 3.25 1.2a11.3 11.3 0 015.92 0c2.26-1.52 3.25-1.2 3.25-1.2.65 1.65.24 2.87.12 3.17.76.82 1.22 1.87 1.22 3.15 0 4.51-2.74 5.5-5.35 5.8.43.37.81 1.1.81 2.22v3.29c0 .32.21.7.81.58C20.56 20.87 24 16.84 24 12c0-5.52-4.48-10-10-10z" /></svg></a>
+      </div>
+      <div class="mt-6 p-4 rounded-xl bg-gradient-to-br from-blue-50 to-red-50 text-gray-700 text-sm shadow">
+        Nous nous engageons à répondre à tous les messages dans les 24 heures. Pour les demandes urgentes, n'hésitez pas à nous appeler directement.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-gray-900 text-gray-100 py-12 mt-12">
+  <div class="container max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="bg-gradient-to-br from-red-600 to-red-700 rounded-xl w-8 h-8 flex items-center justify-center">
+          <span class="text-white font-extrabold text-xl">S</span>
+        </div>
+        <span class="text-2xl font-bold tracking-tight">
+          <span class="text-white">Stage</span><span class="text-red-500">Link</span>
+        </span>
+      </div>
+      <p class="text-gray-400 text-sm leading-relaxed">La plateforme innovante qui connecte les étudiants aux opportunités de demain. Votre succès académique et professionnel commence ici.</p>
+    </div>
+    <div>
+      <div class="font-bold mb-2">Navigation</div>
+      <ul class="space-y-1">
+        <li><a href="#home" class="hover:text-red-500 transition">Accueil</a></li>
+        <li><a href="#services" class="hover:text-red-500 transition">Services</a></li>
+        <li><a href="#about" class="hover:text-red-500 transition">À propos</a></li>
+        <li><a href="#contact" class="hover:text-red-500 transition">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="font-bold mb-2">Légal</div>
+      <ul class="space-y-1">
+        <li><a href="#" class="hover:text-red-500 transition">Mentions légales</a></li>
+        <li><a href="#" class="hover:text-red-500 transition">Confidentialité</a></li>
+        <li><a href="#" class="hover:text-red-500 transition">CGU</a></li>
+      </ul>
+    </div>
+    <div class="flex flex-col justify-between">
+      <div class="text-xs text-gray-400">&copy; 2024 StageLink. Tous droits réservés.</div>
+      <div class="text-xs text-gray-400 mt-2">Fait avec <span class="text-red-500">&#10084;</span> pour les étudiants</div>
+    </div>
+  </div>
+</footer>
+</div> 

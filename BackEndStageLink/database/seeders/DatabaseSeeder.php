@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use App\Models\Entreprise;
 use App\Models\OffreStage;
 use App\Models\ProfilEtudiant;
@@ -34,32 +33,6 @@ class DatabaseSeeder extends Seeder
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
         
-        // Création des utilisateurs
-        $users = [
-            [
-                'name' => 'Admin User',
-                'email' => 'admin@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'admin'
-            ],
-            [
-                'name' => 'John Doe',
-                'email' => 'john@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'entreprise'
-            ],
-            [
-                'name' => 'Jane Smith',
-                'email' => 'jane@example.com',
-                'password' => Hash::make('password'),
-                'role' => 'etudiant'
-            ]
-        ];
-
-        foreach ($users as $userData) {
-            User::create($userData);
-        }
-
         // Création des entreprises
         $entreprises = [
             [

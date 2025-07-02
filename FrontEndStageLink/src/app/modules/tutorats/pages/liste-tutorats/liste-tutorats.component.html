@@ -48,12 +48,13 @@
 
     <!-- Liste des tutorats -->
     <div class="bg-white shadow overflow-hidden sm:rounded-md">
-      <div *ngIf="loading" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-500 mb-4"></div>
+        <p class="text-gray-500 text-lg">Chargement des offres de tutorat...</p>
       </div>
 
-      <ul *ngIf="!loading && tutorats.length > 0" class="divide-y divide-gray-200">
-        <li *ngFor="let tutorat of tutorats"
+      <ul *ngIf="!loading && Array.isArray(tutorats) && tutorats.length > 0" class="divide-y divide-gray-200">
+        <li *ngFor="let tutorat of tutorats; trackBy: trackByTutoratId"
             class="px-6 py-4 hover:bg-gray-50 cursor-pointer"
             (click)="goToTutoratDetail(tutorat.id_tutorat)"
             tabindex="0">
@@ -84,23 +85,32 @@
       </div>
     </div>
 
-    <!-- Pagination simplifiée -->
-    <div *ngIf="totalPages > 1" class="mt-8 flex justify-center">
-      <nav class="flex items-center space-x-2">
+    <!-- Pagination avancée -->
+    <div *ngIf="totalPages > 1" class="mt-8 flex justify-center w-full">
+      <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
         <button *ngIf="currentPage > 1" 
                 (click)="onPageChange(currentPage - 1)"
-                class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-          Précédent
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer">
+          <span class="sr-only">Précédent</span>
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
         </button>
-        
-        <span class="px-3 py-2 text-sm text-gray-700">
-          Page {{ currentPage }} sur {{ totalPages }}
-        </span>
-        
+        <button *ngFor="let page of getPageNumbers()"
+                (click)="onPageChange(page)"
+                [class.bg-red-50]="page === currentPage"
+                [class.text-red-600]="page === currentPage"
+                [class.border-red-500]="page === currentPage"
+                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+          {{ page }}
+        </button>
         <button *ngIf="currentPage < totalPages" 
                 (click)="onPageChange(currentPage + 1)"
-                class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-          Suivant
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer">
+          <span class="sr-only">Suivant</span>
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
         </button>
       </nav>
     </div>

@@ -12,6 +12,15 @@ import {
   Langue
 } from '../models/tutorat.model';
 import { environment } from '../../../../environments/environment';
+import { map } from 'rxjs/operators';
+
+// Ajout du type de réponse paginée
+export interface TutoratPaginatedResponse {
+  data: Tutorat[];
+  current_page: number;
+  last_page: number;
+  total: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class TutoratService {
@@ -21,12 +30,16 @@ export class TutoratService {
 
   // Récupérer la liste des matières
   getMatieres(): Observable<Matiere[]> {
-    return this.http.get<Matiere[]>(`${environment.apiUrl}/matieres`);
+    return this.http.get<any>(`${environment.apiUrl}/matieres`).pipe(
+      map(res => Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []))
+    );
   }
 
   // Récupérer la liste des niveaux
   getNiveaux(): Observable<Niveau[]> {
-    return this.http.get<Niveau[]>(`${environment.apiUrl}/niveaux`);
+    return this.http.get<any>(`${environment.apiUrl}/niveaux`).pipe(
+      map(res => Array.isArray(res) ? res : (Array.isArray(res.data) ? res.data : []))
+    );
   }
 
   // Récupérer la liste des langues
@@ -64,7 +77,7 @@ export class TutoratService {
   }
 
   // Récupérer tous les tutorats avec filtres
-  getAll(filters?: TutoratFilters): Observable<any> {
+  getAll(filters?: TutoratFilters): Observable<TutoratPaginatedResponse> {
     let params = new HttpParams();
     
     if (filters) {
@@ -76,7 +89,7 @@ export class TutoratService {
       });
     }
 
-    return this.http.get<any>(this.apiUrl, { params });
+    return this.http.get<TutoratPaginatedResponse>(this.apiUrl, { params });
   }
 
   // Récupérer un tutorat par ID

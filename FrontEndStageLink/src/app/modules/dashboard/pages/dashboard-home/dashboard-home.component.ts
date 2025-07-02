@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
+import { AuthService } from '../../../../auth/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -22,7 +23,10 @@ export class DashboardHomeComponent implements OnInit {
   loading = true;
   error: string | null = null;
 
-  constructor(private dashboardService: DashboardService) { }
+  constructor(
+    private dashboardService: DashboardService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadDashboardData();

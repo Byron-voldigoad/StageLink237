@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\ProfilTuteur;
 use App\Models\ProfilEtudiant;
-use App\Models\User;
 use App\Models\Utilisateur;
 use App\Models\UtilisateurRole;
 use App\Models\Role;

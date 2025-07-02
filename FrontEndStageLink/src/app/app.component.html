@@ -13,7 +13,7 @@
     </div>
 
     <div class="flex flex-col flex-1 min-h-screen">
-      <app-navbar>
+      <app-navbar *ngIf="showLayout">
         <!-- Bouton menu mobile -->
         <button *ngIf="showSidebar" 
                 (click)="toggleSidebar()"
@@ -24,7 +24,7 @@
       <main class="flex-1 p-6 bg-gray-50 overflow-y-auto">
         <router-outlet></router-outlet>
       </main>
-      <app-footer></app-footer>
+      <app-footer *ngIf="showLayout"></app-footer>
     </div>
   </div>
 </div>

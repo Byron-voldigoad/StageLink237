@@ -144,8 +144,8 @@ export class FormTutoratComponent implements OnInit {
     }
 
     const operation: Observable<Tutorat> = this.isEditMode && this.tutoratId
-      ? this.tutoratService.update(this.tutoratId, tutoratData)
-      : this.tutoratService.create(tutoratData as Tutorat);
+      ? this.tutoratService.update(this.tutoratId, tutoratData as Partial<Tutorat>)
+      : this.tutoratService.create(tutoratData as Partial<Tutorat>);
 
     operation.subscribe({
       next: () => {

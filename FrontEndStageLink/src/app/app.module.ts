@@ -1,21 +1,39 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { AppRoutingModule } from './app-routing.module';
+import { HttpClientModule, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AppComponent } from './app.component';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { LoginComponent } from './auth/login.component';
+import { AuthInterceptor } from './auth/auth.interceptor';
+import { HomeComponent } from './home.component';
+import { NavbarComponent } from './core/layout/navbar/navbar.component';
+import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
+import { FooterComponent } from './core/layout/footer/footer.component';
+import { routes } from './app.routes';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent,
+    HomeComponent,
+    NavbarComponent,
+    SidebarComponent,
+    FooterComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
     HttpClientModule,
+    FormsModule,
+    RouterModule.forRoot(routes),
+    CommonModule,
     DashboardModule
   ],
-  providers: [],
+  providers: [
+    provideHttpClient(withInterceptors([AuthInterceptor]))
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { } 

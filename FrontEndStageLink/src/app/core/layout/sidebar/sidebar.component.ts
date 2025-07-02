@@ -2,10 +2,13 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../auth/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, CommonModule],
+  standalone: true,
+  imports: [CommonModule, RouterLink],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
 })
@@ -18,4 +21,17 @@ export class SidebarComponent {
     { name: 'Profil', icon: 'person', link: '/profil' },
     // Ajoutez d'autres liens selon vos besoins
   ];
+
+  user: any = null;
+
+  constructor(private authService: AuthService, private router: Router) {
+    this.user = this.authService.getUser();
+    this.authService.user$.subscribe(u => this.user = u);
+  }
+
+  logout() {
+    this.authService.logout().subscribe(() => {
+      this.router.navigate(['/login']);
+    });
+  }
 }

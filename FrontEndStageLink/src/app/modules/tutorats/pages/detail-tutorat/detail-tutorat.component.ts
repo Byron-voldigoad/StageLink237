@@ -46,7 +46,7 @@ export class DetailTutoratComponent implements OnInit {
   loadTutorat(id: number) {
     this.loading = true;
     this.tutoratService.getById(id).subscribe({
-      next: (tutorat) => {
+      next: (tutorat: Tutorat) => {
         this.tutorat = tutorat;
         this.isTuteur = tutorat.tuteur_id === this.currentUserId;
         this.loading = false;
@@ -55,6 +55,7 @@ export class DetailTutoratComponent implements OnInit {
         console.error('Erreur lors du chargement du tutorat:', error);
         this.error = 'Erreur lors du chargement du tutorat';
         this.loading = false;
+        this.tutorat = undefined;
       }
     });
   }

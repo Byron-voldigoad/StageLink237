@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { TutoratService } from '../../services/tutorat.service';
+import { TutoratService, TutoratPaginatedResponse } from '../../services/tutorat.service';
 import { Tutorat, TutoratFilters, TutoratStats, Matiere, Niveau } from '../../models/tutorat.model';
 
 @Component({
@@ -16,7 +16,8 @@ export class ListeTutoratsComponent implements OnInit {
   constructor(
     private router: Router,
     private tutoratService: TutoratService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {
     this.filterForm = this.fb.group({
       search: [''],
@@ -41,6 +42,7 @@ export class ListeTutoratsComponent implements OnInit {
   totalPages = 1;
   totalItems = 0;
   Math = Math; // Exposer Math pour le template
+  Array = Array; // Exposer Array pour le template
 
 
   ngOnInit() {
@@ -51,39 +53,82 @@ export class ListeTutoratsComponent implements OnInit {
   loadData() {
     this.loading = true;
     this.tutoratService.getAll(this.filters).subscribe({
-      next: (response) => {
-        // Correction NG0900: toujours un tableau
-        let tutorats = Array.isArray(response) ? response : response.data;
-        if (!Array.isArray(tutorats)) tutorats = [];
-        this.tutorats = tutorats;
+      next: (response: TutoratPaginatedResponse) => {
+        this.tutorats = this.cleanTutoratsData(response.data || []);
         this.currentPage = response.current_page || 1;
         this.totalPages = response.last_page || 1;
         this.totalItems = response.total || this.tutorats.length;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des tutorats:', error);
+        this.tutorats = [];
         this.loading = false;
       }
     });
   }
 
+  // Méthode pour nettoyer et valider les données des tutorats
+  private cleanTutoratsData(data: any[]): Tutorat[] {
+    if (!Array.isArray(data)) {
+      console.log('Data n\'est pas un tableau:', data);
+      return [];
+    }
+    
+    console.log('Nettoyage des données, longueur:', data.length);
+    
+    const cleanedData: Tutorat[] = [];
+    
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      
+      // Vérifier que l'item est un objet valide
+      if (!item || typeof item !== 'object' || !item.id_tutorat) {
+        console.log(`Item ${i} invalide:`, item);
+        continue;
+      }
+      
+      console.log(`Traitement item ${i}:`, item);
+      
+      // Créer un nouvel objet simple sans références circulaires
+      const cleanItem: Tutorat = {
+        id_tutorat: Number(item.id_tutorat) || 0,
+        titre: String(item.titre || ''),
+        description: String(item.description || ''),
+        domaine: String(item.domaine || ''),
+        niveau: String(item.niveau || ''),
+        tarif_horaire: Number(item.tarif_horaire) || 0,
+        date_debut: String(item.date_debut || ''),
+        date_fin: String(item.date_fin || ''),
+        statut: item.statut || 'ouverte',
+        tuteur_id: Number(item.tuteur_id) || 0,
+        created_at: String(item.created_at || ''),
+        updated_at: String(item.updated_at || '')
+      };
+      
+      console.log(`Item ${i} nettoyé:`, cleanItem);
+      cleanedData.push(cleanItem);
+    }
+    
+    console.log('Données nettoyées finales:', cleanedData);
+    return cleanedData;
+  }
+
   loadFilters() {
     this.tutoratService.getMatieres().subscribe({
       next: (domaines: Matiere[]) => {
-        this.domaines = domaines;
+        this.domaines = Array.isArray(domaines) ? domaines : [];
       },
       error: (error: any) => {
-        console.error('Erreur lors du chargement des domaines:', error);
+        this.domaines = [];
       }
     });
 
     this.tutoratService.getNiveaux().subscribe({
       next: (niveaux: Niveau[]) => {
-        this.niveaux = niveaux;
+        this.niveaux = Array.isArray(niveaux) ? niveaux : [];
       },
       error: (error: any) => {
-        console.error('Erreur lors du chargement des niveaux:', error);
+        this.niveaux = [];
       }
     });
   }
@@ -144,5 +189,10 @@ export class ListeTutoratsComponent implements OnInit {
   formatPrice(price?: number): string {
     if (!price) return 'Non spécifié';
     return `${price}FCFA/h`;
+  }
+
+  // Fonction trackBy pour optimiser les performances de ngFor
+  trackByTutoratId(index: number, tutorat: Tutorat): number {
+    return tutorat.id_tutorat;
   }
 }

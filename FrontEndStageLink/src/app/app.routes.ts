@@ -2,12 +2,40 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardHomeComponent } from './modules/dashboard/pages/dashboard-home/dashboard-home.component';
+import { LoginComponent } from './auth/login.component';
+import { inject } from '@angular/core';
+import { AuthService } from './auth/auth.service';
+import { Router } from '@angular/router';
+import { ForgotPasswordComponent } from './auth/forgot-password.component';
+import { RegisterComponent } from './auth/register.component';
+import { HomeComponent } from './home.component';
+
+// Guard d'authentification
+const authGuard = () => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  
+  if (authService.isAuthenticated()) {
+    return true;
+  } else {
+    router.navigate(['/login']);
+    return false;
+  }
+};
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardHomeComponent },
+  { path: '', component: HomeComponent },
+  { path: 'login', component: LoginComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'register', component: RegisterComponent },
+  { 
+    path: 'dashboard', 
+    component: DashboardHomeComponent,
+    canActivate: [authGuard]
+  },
   {
     path: 'stages',
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -41,6 +69,7 @@ export const routes: Routes = [
   },
   {
     path: 'tutorats',
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -74,11 +103,13 @@ export const routes: Routes = [
   },
   {
     path: 'sujets',
+    canActivate: [authGuard],
     loadChildren: () =>
       import('./modules/sujet/sujet.module').then((m) => m.SujetModule),
   },
   {
     path: 'messages',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./modules/tuteur/tuteur.component').then(
         (m) => m.TuteurComponent
@@ -86,6 +117,7 @@ export const routes: Routes = [
   },
   {
     path: 'profil',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./modules/etudiant/etudiant.component').then(
         (m) => m.EtudiantComponent

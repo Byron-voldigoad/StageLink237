@@ -7,8 +7,8 @@ import { inject } from '@angular/core';
 import { AuthService } from './auth/auth.service';
 import { Router } from '@angular/router';
 import { ForgotPasswordComponent } from './auth/forgot-password.component';
-import { RegisterComponent } from './auth/register.component';
 import { HomeComponent } from './home.component';
+import { RegisterUserComponent } from './features/auth/register-user/register-user.component';
 
 // Guard d'authentification
 const authGuard = () => {
@@ -27,7 +27,8 @@ export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'register', component: RegisterComponent },
+  { path: 'register-user', component: RegisterUserComponent },
+  { path: 'register-entreprise', loadComponent: () => import('./features/auth/register-entreprise/register-entreprise.component').then(m => m.RegisterEntrepriseComponent) },
   { 
     path: 'dashboard', 
     component: DashboardHomeComponent,

@@ -32,7 +32,7 @@ export class AppComponent {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        const noLayoutRoutes = ['/', '/login', '/register', '/forgot-password'];
+        const noLayoutRoutes = ['/', '/login', '/register-user', '/register-entreprise', '/forgot-password'];
         const currentUrl = event.urlAfterRedirects || event.url;
         this.showSidebar = !noLayoutRoutes.some(route => currentUrl === route);
         this.showLayout = !noLayoutRoutes.some(route => currentUrl === route);

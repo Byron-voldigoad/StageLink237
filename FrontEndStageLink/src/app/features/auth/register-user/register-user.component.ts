@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-register',
+  selector: 'app-register-user',
   standalone: true,
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
+  templateUrl: './register-user.component.html',
+  styleUrls: ['./register-user.component.css'],
   imports: [CommonModule, FormsModule]
 })
-export class RegisterComponent {
+export class RegisterUserComponent {
+  type = 'etudiant';
   prenom = '';
   nom = '';
   email = '';
@@ -18,6 +19,15 @@ export class RegisterComponent {
   error = '';
   success = '';
   loading = false;
+
+  // Champs enseignant
+  justificatif: File | null = null;
+
+  onFileChange(event: any) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.justificatif = event.target.files[0];
+    }
+  }
 
   onSubmit() {
     if (!this.prenom || !this.nom || !this.email || !this.password || !this.password_confirmation) {
@@ -28,11 +38,15 @@ export class RegisterComponent {
       this.error = 'Les mots de passe ne correspondent pas.';
       return;
     }
-    
+    if (this.type === 'enseignant') {
+      if (!this.justificatif) {
+        this.error = 'Le justificatif est obligatoire pour les enseignants.';
+        return;
+      }
+    }
     this.loading = true;
     this.error = '';
     this.success = '';
-    
     // Simulation d'inscription (à remplacer par votre logique)
     setTimeout(() => {
       this.loading = false;

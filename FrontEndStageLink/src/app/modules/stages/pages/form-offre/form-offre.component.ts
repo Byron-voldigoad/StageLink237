@@ -7,6 +7,8 @@ import { OffreStageService } from '../../services/offre-stage.service';
 import { OffreStage } from '../../models/offre-stage.model';
 import { EntrepriseService } from '../../../../services/entreprise.service';
 import { Entreprise } from '../../../../models/entreprise.model';
+import { Secteur } from '../../models/secteur.model';
+import { environment } from 'src/environments/environment';
 
 interface CompetenceGroup {
   label: string;
@@ -27,6 +29,7 @@ export class FormOffreComponent implements OnInit {
   error: string | null = null;
   selectedCompetences: string[] = [];
   entreprises: Entreprise[] = [];
+  secteurs: Secteur[] = [];
   competenceGroups = [
     {
       label: 'Développement Web',
@@ -203,7 +206,7 @@ export class FormOffreComponent implements OnInit {
       duree_nombre: [null, [Validators.required, Validators.min(1)]],
       duree_unite: ['mois', Validators.required],
       localisation: [''],
-      secteur: [''],
+      secteur_id: ['', Validators.required],
       remuneration: [null, [Validators.min(0)]],
       date_debut: [''],
       date_fin: [''],
@@ -213,6 +216,7 @@ export class FormOffreComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadEntreprises();
+    this.loadSecteurs();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
@@ -229,6 +233,13 @@ export class FormOffreComponent implements OnInit {
         this.error = 'Erreur lors du chargement des entreprises';
         console.error('Erreur:', error);
       }
+    });
+  }
+
+  loadSecteurs(): void {
+    this.offreStageService['http'].get<Secteur[]>(`${environment.apiUrl}/secteurs`).subscribe({
+      next: (secteurs) => this.secteurs = secteurs,
+      error: () => this.secteurs = []
     });
   }
 

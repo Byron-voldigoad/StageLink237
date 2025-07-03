@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             SujetsExamenSeeder::class,
             ProfilsSeeder::class,
             TutoratSeeder::class,
+            SecteursSeeder::class,
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');

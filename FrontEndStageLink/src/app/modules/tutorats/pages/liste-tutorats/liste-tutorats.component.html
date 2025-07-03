@@ -1,12 +1,8 @@
 <div class="min-h-screen bg-gray-50 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header -->
+    <!-- Bouton de création -->
     <div class="mb-8">
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">Offres de Tutorat</h1>
-          <p class="mt-2 text-gray-600">Découvrez les opportunités de tutorat disponibles</p>
-        </div>
+      <div class="flex justify-end items-center">
         <a routerLink="/tutorats/nouveau" 
            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700">
           <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,17 +23,17 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input type="text" formControlName="search" 
                    (input)="onFilterChange()"
-                   class="px-3 py-2 border border-gray-300 rounded-md"
+                   class="px-3 py-2 h-8 border border-gray-300 rounded-md"
                    placeholder="Rechercher...">
             <select formControlName="domaine" 
                     (change)="onFilterChange()"
-                    class="px-3 py-2 border border-gray-300 rounded-md">
+                    class="px-3 py-2 h-8 border border-gray-300 rounded-md">
               <option value="">Tous les domaines</option>
               <option *ngFor="let domaine of domaines" [value]="domaine.nom">{{ domaine.nom }}</option>
             </select>
             <select formControlName="niveau" 
                     (change)="onFilterChange()"
-                    class="px-3 py-2 border border-gray-300 rounded-md">
+                    class="px-3 py-2 h-8 border border-gray-300 rounded-md">
               <option value="">Tous les niveaux</option>
               <option *ngFor="let niveau of niveaux" [value]="niveau.nom">{{ niveau.nom }}</option>
             </select>

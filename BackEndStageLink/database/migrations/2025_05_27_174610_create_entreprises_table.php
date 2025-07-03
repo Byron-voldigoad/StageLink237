@@ -15,7 +15,7 @@ class CreateEntreprisesTable extends Migration
             $table->text('description')->nullable();
             $table->string('secteur')->nullable();
             $table->string('telephone', 20)->nullable();
-            $table->text('adresse');
+            $table->string('adresse', 255)->nullable();
             $table->string('site_web')->nullable();
             $table->string('logo_path')->nullable();
             $table->string('nif')->unique()->nullable();

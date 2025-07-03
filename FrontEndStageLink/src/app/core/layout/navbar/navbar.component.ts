@@ -19,22 +19,21 @@ export class NavbarComponent implements OnInit {
     private titleService: TitleService,
     public themeService: ThemeService
   ) {
+    // Initialisation du titre
+    const initialTitle = this.titleService.getRouteTitle(this.router.url);
+    this.titleService.setTitle(initialTitle);
+    this.currentTitle = initialTitle;
+
+    // Souscription aux changements de titre
+    this.titleService.title$.subscribe(title => {
+      this.currentTitle = title;
+    });
+
+    // Gestion des changements d'URL
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        if (event.urlAfterRedirects.startsWith('/dashboard')) {
-          this.titleService.setTitle('Dashboard');
-        } else if (event.urlAfterRedirects.startsWith('/stages')) {
-          this.titleService.setTitle('Offres de stage');
-        } else if (event.urlAfterRedirects.startsWith('/sujets-examen')) {
-          this.titleService.setTitle("Sujets d'examen");
-        } else if (event.urlAfterRedirects.startsWith('/messages')) {
-          this.titleService.setTitle('Messages');
-        } else if (event.urlAfterRedirects.startsWith('/profil')) {
-          this.titleService.setTitle('Profil');
-          this.currentTitle = 'Profil';
-        } else {
-          this.currentTitle = 'StageLink';
-        }
+        const title = this.titleService.getRouteTitle(event.urlAfterRedirects);
+        this.titleService.setTitle(title);
       }
     });
   }

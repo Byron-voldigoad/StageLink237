@@ -25,23 +25,23 @@ class UtilisateurController extends Controller
             $data = $request->all();
             \Log::info('Données reçues pour inscription utilisateur', $data);
             $validated = validator($data, [
-                'email' => 'required|email|unique:utilisateurs',
+            'email' => 'required|email|unique:utilisateurs',
                 'password' => 'required|string|min:8',
                 'nom' => 'required|string|max:100',
                 'prenom' => 'required|string|max:100',
-                'role' => 'required|in:admin,etudiant,tuteur,entreprise'
+            'role' => 'required|in:admin,etudiant,tuteur,entreprise'
             ])->validate();
 
-            $user = Utilisateur::create([
+        $user = Utilisateur::create([
                 'nom' => $validated['nom'],
                 'prenom' => $validated['prenom'],
-                'email' => $validated['email'],
+            'email' => $validated['email'],
                 'mot_de_passe' => bcrypt($validated['password'])
-            ]);
+        ]);
 
-            // Assigner le rôle
+        // Assigner le rôle
             $role = \App\Models\Role::where('nom_role', $validated['role'])->first();
-            if ($role) {
+        if ($role) {
                 $user->roles()->attach($role, ['created_at' => now(), 'updated_at' => now()]);
             }
 
@@ -55,9 +55,9 @@ class UtilisateurController extends Controller
                     'utilisateur_id' => $user->id_utilisateur,
                     'diplomes' => $diplomePath,
                 ]);
-            }
+        }
 
-            return response()->json($user->load('roles'), 201);
+        return response()->json($user->load('roles'), 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['errors' => $e->errors(), 'message' => 'Validation failed', 'debug' => $data], 422);
         } catch (\Exception $e) {

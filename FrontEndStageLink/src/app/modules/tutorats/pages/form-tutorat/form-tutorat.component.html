@@ -46,7 +46,7 @@
           <div>
             <label for="titre" class="block text-sm font-medium text-gray-700">Titre *</label>
             <input type="text" id="titre" formControlName="titre"
-                   [class]="'mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('titre') ? 'border-red-300' : 'border-gray-300')"
+                   [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('titre') ? 'border-red-300' : 'border-gray-300')"
                    placeholder="Ex: Cours de mathématiques niveau lycée">
             <p *ngIf="getFieldError('titre')" class="mt-1 text-sm text-red-600">{{ getFieldError('titre') }}</p>
           </div>
@@ -55,7 +55,7 @@
           <div>
             <label for="domaine" class="block text-sm font-medium text-gray-700">Matière enseignée *</label>
             <select id="domaine" formControlName="domaine"
-                    [class]="'mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('domaine') ? 'border-red-300' : 'border-gray-300')">
+                    [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('domaine') ? 'border-red-300' : 'border-gray-300')">
               <option value="">Sélectionnez une matière</option>
               <option *ngFor="let matiere of matieres" [value]="matiere.nom">{{ matiere.nom }}</option>
             </select>
@@ -66,7 +66,7 @@
           <div>
             <label for="niveau" class="block text-sm font-medium text-gray-700">Niveau *</label>
             <select id="niveau" formControlName="niveau"
-                    [class]="'mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('niveau') ? 'border-red-300' : 'border-gray-300')">
+                    [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('niveau') ? 'border-red-300' : 'border-gray-300')">
               <option value="">Sélectionnez un niveau</option>
               <option *ngFor="let niveau of niveaux" [value]="niveau.nom">{{ niveau.nom }}</option>
             </select>
@@ -77,7 +77,7 @@
           <div>
             <label for="localisation" class="block text-sm font-medium text-gray-700">Localisation</label>
             <input type="text" id="localisation" formControlName="localisation"
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="Ex: Paris, Lyon, En ligne">
           </div>
 
@@ -95,7 +95,7 @@
                 </button>
               </span>
             </div>
-            <select id="langue-select" (change)="addLangueFromSelect($event)" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
+            <select id="langue-select" (change)="addLangueFromSelect($event)" class="mt-1 block w-full h-12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md">
               <option value="" disabled selected>Ajouter une langue...</option>
               <option *ngFor="let langue of availableLangues" [value]="langue.nom">{{ langue.nom }}</option>
             </select>
@@ -117,14 +117,14 @@
           <div>
             <label for="date_debut" class="block text-sm font-medium text-gray-700">Date de début *</label>
             <input type="date" id="date_debut" formControlName="date_debut"
-                   [class]="'mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_debut') ? 'border-red-300' : 'border-gray-300')">
+                   [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_debut') ? 'border-red-300' : 'border-gray-300')">
             <p *ngIf="getFieldError('date_debut')" class="mt-1 text-sm text-red-600">{{ getFieldError('date_debut') }}</p>
           </div>
 
           <div>
             <label for="date_fin" class="block text-sm font-medium text-gray-700">Date de fin *</label>
             <input type="date" id="date_fin" formControlName="date_fin"
-                   [class]="'mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_fin') ? 'border-red-300' : 'border-gray-300')">
+                   [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_fin') ? 'border-red-300' : 'border-gray-300')">
             <p *ngIf="getFieldError('date_fin')" class="mt-1 text-sm text-red-600">{{ getFieldError('date_fin') }}</p>
           </div>
         </div>
@@ -134,7 +134,7 @@
           <div>
             <label for="tarif_horaire" class="block text-sm font-medium text-gray-700">Tarif horaire (FCFA)</label>
             <input type="number" id="tarif_horaire" formControlName="tarif_horaire" min="0" step="0.01"
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="25.00">
             <p *ngIf="getFieldError('tarif_horaire')" class="mt-1 text-sm text-red-600">{{ getFieldError('tarif_horaire') }}</p>
           </div>
@@ -142,7 +142,7 @@
           <div>
             <label for="duree_seance" class="block text-sm font-medium text-gray-700">Durée séance (min)</label>
             <input type="number" id="duree_seance" formControlName="duree_seance" min="15"
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="60">
             <p *ngIf="getFieldError('duree_seance')" class="mt-1 text-sm text-red-600">{{ getFieldError('duree_seance') }}</p>
           </div>
@@ -150,7 +150,7 @@
           <div>
             <label for="nombre_seances" class="block text-sm font-medium text-gray-700">Nombre de séances</label>
             <input type="number" id="nombre_seances" formControlName="nombre_seances" min="1"
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="10">
             <p *ngIf="getFieldError('nombre_seances')" class="mt-1 text-sm text-red-600">{{ getFieldError('nombre_seances') }}</p>
           </div>
@@ -161,21 +161,21 @@
           <div>
             <label for="prerequis" class="block text-sm font-medium text-gray-700">Prérequis</label>
             <textarea id="prerequis" formControlName="prerequis" rows="3"
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Connaissances requises pour suivre ce tutorat..."></textarea>
           </div>
 
           <div>
             <label for="objectifs" class="block text-sm font-medium text-gray-700">Objectifs</label>
             <textarea id="objectifs" formControlName="objectifs" rows="3"
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Ce que l'étudiant va apprendre..."></textarea>
           </div>
 
           <div>
             <label for="methode_pedagogique" class="block text-sm font-medium text-gray-700">Méthode pédagogique</label>
             <textarea id="methode_pedagogique" formControlName="methode_pedagogique" rows="3"
-                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                      class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Votre approche pédagogique..."></textarea>
           </div>
         </div>

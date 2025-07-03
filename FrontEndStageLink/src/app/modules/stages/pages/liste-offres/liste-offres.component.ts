@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { OffreStageService } from '../../services/offre-stage.service';
 import { OffreStage } from '../../models/offre-stage.model';
 import { PaginatedResponse } from '../../../../core/models/pagination.model';
+import { Secteur } from '../../models/secteur.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-liste-offres',
@@ -23,34 +25,13 @@ export class ListeOffresComponent implements OnInit {
 
   // Propriétés pour les filtres
   searchTerm = '';
-  selectedSecteur = '';
+  selectedSecteurId: number | '' = '';
   selectedDuree = '';
   selectedLocalisation = '';
   selectedStatut = '';
 
   // Listes pour les filtres
-  secteurs: string[] = [
-    'developpement_web',
-    'design_ui_ux',
-    'data_science',
-    'cloud_computing',
-    'developpement_mobile',
-    'cybersecurite',
-    'intelligence_artificielle',
-    'gestion_de_projet'
-  ];
-
-  // Map pour l'affichage des secteurs
-  secteurLabels: { [key: string]: string } = {
-    'developpement_web': 'Développement Web',
-    'design_ui_ux': 'Design UI/UX',
-    'data_science': 'Data Science',
-    'cloud_computing': 'Cloud Computing',
-    'developpement_mobile': 'Développement Mobile',
-    'cybersecurite': 'Cybersécurité',
-    'intelligence_artificielle': 'Intelligence Artificielle',
-    'gestion_de_projet': 'Gestion de Projet'
-  };
+  secteurs: Secteur[] = [];
 
   localisations: string[] = [
     'Douala',
@@ -73,6 +54,7 @@ export class ListeOffresComponent implements OnInit {
   constructor(private offreStageService: OffreStageService) {}
 
   ngOnInit(): void {
+    this.loadSecteurs();
     this.loadOffres();
   }
 
@@ -101,8 +83,8 @@ export class ListeOffresComponent implements OnInit {
         offre.description.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         offre.entreprise?.nom.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-      const matchesSecteur = !this.selectedSecteur || 
-        offre.secteur?.toLowerCase() === this.selectedSecteur.toLowerCase();
+      const matchesSecteur = !this.selectedSecteurId || 
+        offre.secteur_id === this.selectedSecteurId;
 
       const matchesDuree = !this.selectedDuree || 
         (offre.duree ? this.matchesDuree(offre.duree, this.selectedDuree) : false);
@@ -137,7 +119,7 @@ export class ListeOffresComponent implements OnInit {
 
   resetFilters(): void {
     this.searchTerm = '';
-    this.selectedSecteur = '';
+    this.selectedSecteurId = '';
     this.selectedDuree = '';
     this.selectedLocalisation = '';
     this.selectedStatut = '';
@@ -172,5 +154,12 @@ export class ListeOffresComponent implements OnInit {
     return offre.remuneration > 0 
       ? `${offre.remuneration} Ar/mois` 
       : 'Non rémunéré';
+  }
+
+  loadSecteurs() {
+    this.offreStageService['http'].get<Secteur[]>(`${environment.apiUrl}/secteurs`).subscribe({
+      next: (secteurs) => this.secteurs = secteurs,
+      error: () => this.secteurs = []
+    });
   }
 } 

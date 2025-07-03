@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TitleService } from '../../../../core/services/title.service';
 import { SujetExamenService } from '../../services/sujet-examen.service';
 import { MatiereService } from '../../services/matiere.service';
 import { NiveauService } from '../../services/niveau.service';
@@ -38,8 +39,12 @@ export class SujetExamenListComponent implements OnInit {
     private niveauService: NiveauService,
     private anneeAcademiqueService: AnneeAcademiqueService,
     private typeSujetService: TypeSujetService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private titleService: TitleService
+  ) {
+    // Définir le titre de la page
+    this.titleService.setTitle('Sujets d\'examen');
+  }
 
   ngOnInit(): void {
     this.loadInitialData();

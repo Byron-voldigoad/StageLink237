@@ -28,7 +28,7 @@ class OffreStageController extends Controller
             'date_fin' => 'nullable|date',
             'localisation' => 'nullable|string|max:255',
             'remuneration' => 'nullable|numeric|min:0',
-            'secteur' => 'required|string',
+            'secteur_id' => 'required|exists:secteurs,id',
             'statut' => 'required|in:ouvert,ferme,en_attente'
         ]);
 
@@ -37,9 +37,12 @@ class OffreStageController extends Controller
         }
 
         $data = $request->all();
-        if (empty($data['competences_requises']) && !empty($data['secteur'])) {
-            $competences = CompetencesService::getCompetencesParSecteur($data['secteur']);
-            $data['competences_requises'] = implode("\n", $competences);
+        if (empty($data['competences_requises']) && !empty($data['secteur_id'])) {
+            $secteur = \App\Models\Secteur::find($data['secteur_id']);
+            if ($secteur) {
+                $competences = CompetencesService::getCompetencesParSecteur($secteur->nom);
+                $data['competences_requises'] = implode("\n", $competences);
+            }
         }
 
         $offre = OffreStage::create($data);
@@ -67,7 +70,7 @@ class OffreStageController extends Controller
             'date_fin' => 'nullable|date',
             'localisation' => 'nullable|string|max:255',
             'remuneration' => 'nullable|numeric|min:0',
-            'secteur' => 'sometimes|required|string',
+            'secteur_id' => 'sometimes|required|exists:secteurs,id',
             'statut' => 'sometimes|required|in:ouvert,ferme,en_attente'
         ]);
 
@@ -78,9 +81,12 @@ class OffreStageController extends Controller
         $offre = OffreStage::findOrFail($id);
         $data = $request->all();
 
-        if (isset($data['secteur']) && (empty($data['competences_requises']) || !isset($data['competences_requises']))) {
-            $competences = CompetencesService::getCompetencesParSecteur($data['secteur']);
-            $data['competences_requises'] = implode("\n", $competences);
+        if (isset($data['secteur_id']) && (empty($data['competences_requises']) || !isset($data['competences_requises']))) {
+            $secteur = \App\Models\Secteur::find($data['secteur_id']);
+            if ($secteur) {
+                $competences = CompetencesService::getCompetencesParSecteur($secteur->nom);
+                $data['competences_requises'] = implode("\n", $competences);
+            }
         }
 
         $offre->update($data);

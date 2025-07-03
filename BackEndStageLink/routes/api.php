@@ -11,6 +11,7 @@ use App\Http\Controllers\NiveauController;
 use App\Http\Controllers\AnneeAcademiqueController;
 use App\Http\Controllers\TutoratController;
 use App\Http\Controllers\LangueController;
+use App\Http\Controllers\SecteurController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('langues', [LangueController::class, 'index']);
+Route::get('secteurs', [SecteurController::class, 'index']);
 
 // Toutes les autres routes sont protégées par auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
@@ -93,3 +95,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Route publique pour l'inscription utilisateur
 Route::post('utilisateurs', [App\Http\Controllers\UtilisateurController::class, 'store']);
+Route::post('entreprises', [App\Http\Controllers\EntrepriseController::class, 'store']);

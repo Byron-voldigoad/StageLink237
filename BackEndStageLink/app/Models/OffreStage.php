@@ -46,4 +46,9 @@ class OffreStage extends Model
     {
         return $this->hasMany(Candidature::class);
     }
+
+    public function secteur()
+    {
+        return $this->belongsTo(Secteur::class, 'secteur_id');
+    }
 }

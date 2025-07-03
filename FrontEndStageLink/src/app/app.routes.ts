@@ -53,77 +53,46 @@ export const routes: Routes = [
           ),
       },
       {
-        path: ':id',
-        loadComponent: () =>
-          import('./modules/stages/pages/detail-offre/detail-offre.component').then(
-            (m) => m.DetailOffreComponent
-          ),
-      },
-      {
-        path: ':id/modifier',
+        path: 'modifier/:id',
         loadComponent: () =>
           import('./modules/stages/pages/form-offre/form-offre.component').then(
             (m) => m.FormOffreComponent
           ),
       },
-    ],
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./modules/stages/pages/detail-offre/detail-offre.component').then(
+            (m) => m.DetailOffreComponent
+          ),
+      }
+    ]
+  },
+  {
+    path: 'sujets-examen',
+    canActivate: [authGuard],
+    loadChildren: () => import('./modules/sujet/sujet.module').then(m => m.SujetModule)
   },
   {
     path: 'tutorats',
     canActivate: [authGuard],
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./modules/tutorats/pages/liste-tutorats/liste-tutorats.component').then(
-            (m) => m.ListeTutoratsComponent
-          ),
-      },
-      {
-        path: 'nouveau',
-        loadComponent: () =>
-          import('./modules/tutorats/pages/form-tutorat/form-tutorat.component').then(
-            (m) => m.FormTutoratComponent
-          ),
-      },
-      {
-        path: ':id',
-        loadComponent: () =>
-          import('./modules/tutorats/pages/detail-tutorat/detail-tutorat.component').then(
-            (m) => m.DetailTutoratComponent
-          ),
-      },
-      {
-        path: ':id/modifier',
-        loadComponent: () =>
-          import('./modules/tutorats/pages/form-tutorat/form-tutorat.component').then(
-            (m) => m.FormTutoratComponent
-          ),
-      },
-    ],
+    loadChildren: () => import('./modules/tutorats/tutorats.module').then(m => m.TutoratsModule)
   },
   {
     path: 'sujets',
     canActivate: [authGuard],
-    loadChildren: () =>
-      import('./modules/sujet/sujet.module').then((m) => m.SujetModule),
+    loadChildren: () => import('./modules/sujet/sujet.module').then((m) => m.SujetModule)
   },
   {
     path: 'messages',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./modules/tuteur/tuteur.component').then(
-        (m) => m.TuteurComponent
-      ),
+    loadComponent: () => import('./modules/tuteur/tuteur.component').then((m) => m.TuteurComponent)
   },
   {
     path: 'profil',
     canActivate: [authGuard],
-    loadComponent: () =>
-      import('./modules/etudiant/etudiant.component').then(
-        (m) => m.EtudiantComponent
-      ),
-  },
+    loadComponent: () => import('./modules/etudiant/etudiant.component').then((m) => m.EtudiantComponent)
+  }
 
   
   // ...add more as needed

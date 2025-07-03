@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AppComponent } from './app.component';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { TutoratsModule } from './modules/tutorats/tutorats.module';
 import { LoginComponent } from './auth/login.component';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { HomeComponent } from './home.component';
@@ -29,7 +30,8 @@ import { routes } from './app.routes';
     FormsModule,
     RouterModule.forRoot(routes),
     CommonModule,
-    DashboardModule
+    DashboardModule,
+    TutoratsModule
   ],
   providers: [
     provideHttpClient(withInterceptors([AuthInterceptor]))

@@ -36,7 +36,7 @@
               </label>
               <select 
                 formControlName="id_entreprise"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full rounded-lg h-8 border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 [ngClass]="{'border-red-300': offreForm.get('id_entreprise')?.invalid && offreForm.get('id_entreprise')?.touched}">
                 <option value="">Sélectionnez une entreprise</option>
                 <option *ngFor="let entreprise of entreprises" [value]="entreprise.id_entreprise">
@@ -52,12 +52,12 @@
             <!-- Titre -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Titre <span class="text-red-500">*</span>
+                Titre <span class="text-red-500 h-12">*</span>
               </label>
               <input 
                 type="text" 
                 formControlName="titre"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 [ngClass]="{'border-red-300': offreForm.get('titre')?.invalid && offreForm.get('titre')?.touched}"
                 placeholder="Ex: Développeur Full Stack Angular/Laravel">
               <p *ngIf="offreForm.get('titre')?.invalid && offreForm.get('titre')?.touched" 
@@ -74,7 +74,7 @@
               <textarea 
                 formControlName="description"
                 rows="4"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 [ngClass]="{'border-red-300': offreForm.get('description')?.invalid && offreForm.get('description')?.touched}"
                 placeholder="Décrivez le stage et les missions principales..."></textarea>
               <p *ngIf="offreForm.get('description')?.invalid && offreForm.get('description')?.touched" 
@@ -91,7 +91,7 @@
               <textarea 
                 formControlName="exigences"
                 rows="4"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 placeholder="Listez les prérequis et exigences pour le stage..."></textarea>
             </div>
           </div>
@@ -104,7 +104,7 @@
           <h2 class="text-xl font-semibold text-gray-900 mb-6">Compétences requises</h2>
           
           <!-- Selected Competences -->
-          <div class="mb-4">
+          <div class="mb-4 ">
             <div class="flex flex-wrap gap-2" *ngIf="selectedCompetences.length > 0">
               <div *ngFor="let comp of selectedCompetences" 
                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
@@ -124,7 +124,7 @@
           <div class="relative">
             <select 
               (change)="addCompetence($event)"
-              class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+              class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
               <option value="">Ajouter une compétence...</option>
               <optgroup *ngFor="let group of competenceGroups" [label]="group.label">
                 <option *ngFor="let comp of group.competences" [value]="comp">
@@ -151,7 +151,7 @@
                   type="number" 
                   formControlName="duree_nombre"
                   min="1"
-                  class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                  class="block h-8 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                   placeholder="Ex: 6">
               </div>
               <div>
@@ -160,7 +160,7 @@
                 </label>
                 <select 
                   formControlName="duree_unite"
-                  class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                  class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
                   <option value="mois">Mois</option>
                   <option value="semaines">Semaines</option>
                 </select>
@@ -174,7 +174,7 @@
               </label>
               <select 
                 formControlName="localisation"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
                 <option value="">Sélectionnez une ville</option>
                 <option value="Douala">Douala</option>
                 <option value="Yaoundé">Yaoundé</option>
@@ -201,21 +201,18 @@
             <!-- Secteur -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">
-                Secteur
+                Secteur <span class="text-red-500">*</span>
               </label>
               <select 
-                formControlName="secteur"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                formControlName="secteur_id"
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
                 <option value="">Sélectionnez un secteur</option>
-                <option value="developpement_web">Développement Web</option>
-                <option value="design_ui_ux">Design UI/UX</option>
-                <option value="data_science">Data Science</option>
-                <option value="cloud_computing">Cloud Computing</option>
-                <option value="developpement_mobile">Développement Mobile</option>
-                <option value="cybersecurite">Cybersécurité</option>
-                <option value="intelligence_artificielle">Intelligence Artificielle</option>
-                <option value="gestion_de_projet">Gestion de Projet</option>
+                <option *ngFor="let secteur of secteurs" [value]="secteur.id">{{ secteur.nom }}</option>
               </select>
+              <p *ngIf="offreForm.get('secteur_id')?.invalid && offreForm.get('secteur_id')?.touched" 
+                 class="mt-2 text-sm text-red-600">
+                Le secteur est requis
+              </p>
             </div>
 
             <!-- Rémunération -->
@@ -228,7 +225,7 @@
                 formControlName="remuneration"
                 min="0"
                 step="5000"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 placeholder="Ex: 50000">
             </div>
 
@@ -241,7 +238,7 @@
                 type="date" 
                 formControlName="date_debut"
                 (change)="updateDateFin()"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
             </div>
 
             <div>
@@ -252,7 +249,7 @@
                 type="date" 
                 formControlName="date_fin"
                 readonly
-                class="block w-full rounded-lg border-gray-300 bg-gray-50 shadow-sm sm:text-sm cursor-not-allowed">
+                class="block w-full h-12 rounded-lg border-gray-300 bg-gray-50 shadow-sm sm:text-sm cursor-not-allowed">
             </div>
 
             <!-- Statut -->
@@ -262,7 +259,7 @@
               </label>
               <select 
                 formControlName="statut"
-                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
                 <option value="en_attente">En attente</option>
                 <option value="ouvert">Ouvert</option>
                 <option value="ferme">Fermé</option>

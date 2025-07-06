@@ -1,5 +1,5 @@
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-50 py-10">
+  <div class="max-w-4xl mx-auto px-6 sm:px-8 lg:px-10">
     <!-- Header -->
     <div class="mb-8">
       <div class="flex items-center justify-between">
@@ -25,7 +25,7 @@
 
     <!-- Formulaire -->
     <div *ngIf="!loading && !loadingData" class="bg-white shadow rounded-lg">
-      <form [formGroup]="tutoratForm" (ngSubmit)="onSubmit()" class="space-y-6 p-6">
+      <form [formGroup]="tutoratForm" (ngSubmit)="onSubmit()" class="space-y-8 p-8">
         <!-- Erreur générale -->
         <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4">
           <div class="flex">
@@ -41,12 +41,12 @@
         </div>
 
         <!-- Informations de base -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
           <!-- Titre -->
           <div>
             <label for="titre" class="block text-sm font-medium text-gray-700">Titre *</label>
             <input type="text" id="titre" formControlName="titre"
-                   [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('titre') ? 'border-red-300' : 'border-gray-300')"
+                   [class]="'mt-1 block w-full h-8 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('titre') ? 'border-red-300' : 'border-gray-300')"
                    placeholder="Ex: Cours de mathématiques niveau lycée">
             <p *ngIf="getFieldError('titre')" class="mt-1 text-sm text-red-600">{{ getFieldError('titre') }}</p>
           </div>
@@ -77,7 +77,7 @@
           <div>
             <label for="localisation" class="block text-sm font-medium text-gray-700">Localisation</label>
             <input type="text" id="localisation" formControlName="localisation"
-                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="Ex: Paris, Lyon, En ligne">
           </div>
 
@@ -113,28 +113,28 @@
         </div>
 
         <!-- Dates -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
           <div>
             <label for="date_debut" class="block text-sm font-medium text-gray-700">Date de début *</label>
             <input type="date" id="date_debut" formControlName="date_debut"
-                   [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_debut') ? 'border-red-300' : 'border-gray-300')">
+                   [class]="'mt-1 block w-full h-8 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_debut') ? 'border-red-300' : 'border-gray-300')">
             <p *ngIf="getFieldError('date_debut')" class="mt-1 text-sm text-red-600">{{ getFieldError('date_debut') }}</p>
           </div>
 
           <div>
             <label for="date_fin" class="block text-sm font-medium text-gray-700">Date de fin *</label>
             <input type="date" id="date_fin" formControlName="date_fin"
-                   [class]="'mt-1 block w-full h-12 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_fin') ? 'border-red-300' : 'border-gray-300')">
+                   [class]="'mt-1 block w-full h-8 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 ' + (isFieldInvalid('date_fin') ? 'border-red-300' : 'border-gray-300')">
             <p *ngIf="getFieldError('date_fin')" class="mt-1 text-sm text-red-600">{{ getFieldError('date_fin') }}</p>
           </div>
         </div>
 
         <!-- Tarifs et durée -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
           <div>
             <label for="tarif_horaire" class="block text-sm font-medium text-gray-700">Tarif horaire (FCFA)</label>
             <input type="number" id="tarif_horaire" formControlName="tarif_horaire" min="0" step="0.01"
-                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="25.00">
             <p *ngIf="getFieldError('tarif_horaire')" class="mt-1 text-sm text-red-600">{{ getFieldError('tarif_horaire') }}</p>
           </div>
@@ -142,7 +142,7 @@
           <div>
             <label for="duree_seance" class="block text-sm font-medium text-gray-700">Durée séance (min)</label>
             <input type="number" id="duree_seance" formControlName="duree_seance" min="15"
-                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="60">
             <p *ngIf="getFieldError('duree_seance')" class="mt-1 text-sm text-red-600">{{ getFieldError('duree_seance') }}</p>
           </div>
@@ -150,38 +150,38 @@
           <div>
             <label for="nombre_seances" class="block text-sm font-medium text-gray-700">Nombre de séances</label>
             <input type="number" id="nombre_seances" formControlName="nombre_seances" min="1"
-                   class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                   class="mt-1 block w-full h-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                    placeholder="10">
             <p *ngIf="getFieldError('nombre_seances')" class="mt-1 text-sm text-red-600">{{ getFieldError('nombre_seances') }}</p>
           </div>
         </div>
 
         <!-- Informations pédagogiques -->
-        <div class="space-y-6">
+        <div class="space-y-8">
           <div>
             <label for="prerequis" class="block text-sm font-medium text-gray-700">Prérequis</label>
-            <textarea id="prerequis" formControlName="prerequis" rows="3"
-                      class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+            <textarea id="prerequis" formControlName="prerequis" rows="4"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Connaissances requises pour suivre ce tutorat..."></textarea>
           </div>
 
           <div>
             <label for="objectifs" class="block text-sm font-medium text-gray-700">Objectifs</label>
-            <textarea id="objectifs" formControlName="objectifs" rows="3"
-                      class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+            <textarea id="objectifs" formControlName="objectifs" rows="4"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Ce que l'étudiant va apprendre..."></textarea>
           </div>
 
           <div>
             <label for="methode_pedagogique" class="block text-sm font-medium text-gray-700">Méthode pédagogique</label>
-            <textarea id="methode_pedagogique" formControlName="methode_pedagogique" rows="3"
-                      class="mt-1 block w-full h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+            <textarea id="methode_pedagogique" formControlName="methode_pedagogique" rows="4"
+                      class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
                       placeholder="Votre approche pédagogique..."></textarea>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+        <div class="flex justify-end space-x-6 pt-8 border-t border-gray-200 mt-10">
           <a routerLink="/tutorats" 
              class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
             Annuler

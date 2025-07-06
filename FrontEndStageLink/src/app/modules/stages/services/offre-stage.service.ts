@@ -5,6 +5,7 @@ import { catchError, retry } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { OffreStage } from '../models/offre-stage.model';
 import { Entreprise } from '../models/entreprise.model';
+import { Secteur } from '../models/secteur.model';
 import { PaginatedResponse } from '../../../core/models/pagination.model';
 
 @Injectable({
@@ -37,6 +38,12 @@ export class OffreStageService {
 
   deleteOffre(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getSecteurs(): Observable<Secteur[]> {
+    return this.http.get<Secteur[]>(`${environment.apiUrl}/secteurs`).pipe(
+      catchError(this.handleError)
+    );
   }
 
   private handleError(error: HttpErrorResponse) {

@@ -74,7 +74,7 @@
               <textarea 
                 formControlName="description"
                 rows="4"
-                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full h-15 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 [ngClass]="{'border-red-300': offreForm.get('description')?.invalid && offreForm.get('description')?.touched}"
                 placeholder="Décrivez le stage et les missions principales..."></textarea>
               <p *ngIf="offreForm.get('description')?.invalid && offreForm.get('description')?.touched" 
@@ -91,7 +91,7 @@
               <textarea 
                 formControlName="exigences"
                 rows="4"
-                class="block w-full h-8 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                class="block w-full h-15 rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                 placeholder="Listez les prérequis et exigences pour le stage..."></textarea>
             </div>
           </div>
@@ -151,7 +151,7 @@
                   type="number" 
                   formControlName="duree_nombre"
                   min="1"
-                  class="block h-8 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
+                  class="block h-7 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
                   placeholder="Ex: 6">
               </div>
               <div>
@@ -249,7 +249,7 @@
                 type="date" 
                 formControlName="date_fin"
                 readonly
-                class="block w-full h-12 rounded-lg border-gray-300 bg-gray-50 shadow-sm sm:text-sm cursor-not-allowed">
+                class="block w-full h-8 rounded-lg border-gray-300 bg-gray-50 shadow-sm sm:text-sm cursor-not-allowed">
             </div>
 
             <!-- Statut -->

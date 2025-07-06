@@ -27,6 +27,9 @@ export class SujetExamenFormComponent implements OnInit {
   selectedFile: File | null = null;
   isEditMode = false;
   isSubmitting = false;
+  isLoading = false;
+  private loadingCounter = 0;
+  private readonly TOTAL_LOADING_OPERATIONS = 4; // Nombre d'appels API dans loadData
 
   constructor(
     private fb: FormBuilder,
@@ -70,32 +73,78 @@ export class SujetExamenFormComponent implements OnInit {
   }
 
   loadData(): void {
+    this.isLoading = true;
+    
     this.matiereService.getAll().subscribe({
-      next: (data) => this.matieres = data,
-      error: (error) => console.error('Erreur lors du chargement des matières:', error)
+      next: (data) => {
+        this.matieres = Array.isArray(data) ? data : [];
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des matières:', error);
+        this.message = 'Impossible de charger les matières. Veuillez réessayer plus tard.';
+        this.messageType = 'error';
+      },
+      complete: () => {
+        this.checkLoadingComplete();
+      }
     });
 
     this.niveauService.getAll().subscribe({
-      next: (data) => this.niveaux = data,
-      error: (error) => console.error('Erreur lors du chargement des niveaux:', error)
+      next: (data) => {
+        this.niveaux = Array.isArray(data) ? data : [];
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des niveaux:', error);
+        this.message = 'Erreur lors du chargement des niveaux';
+        this.messageType = 'error';
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.checkLoadingComplete();
+      }
     });
 
     this.anneeAcademiqueService.getAll().subscribe({
       next: (data) => {
         // Filtrer les années pour n'afficher que celles valides selon la structure réelle
-        this.annees = data.filter(a => a && a.id_annee && a.annee_debut && a.annee_fin);
+        this.annees = Array.isArray(data) ? data.filter(a => a && a.id_annee && a.annee_debut && a.annee_fin) : [];
         console.log('Données années reçues:', this.annees);
       },
-      error: (error) => console.error('Erreur lors du chargement des années:', error)
+      error: (error) => {
+        console.error('Erreur lors du chargement des années:', error);
+        this.message = 'Impossible de charger les années académiques. Veuillez réessayer plus tard.';
+        this.messageType = 'error';
+      },
+      complete: () => {
+        this.checkLoadingComplete();
+      }
     });
 
     this.typeSujetService.getAll().subscribe({
-      next: (data) => this.types = data,
-      error: (error) => console.error('Erreur lors du chargement des types:', error)
+      next: (data) => {
+        this.types = Array.isArray(data) ? data : [];
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des types:', error);
+        this.message = 'Impossible de charger les types de sujet. Veuillez réessayer plus tard.';
+        this.messageType = 'error';
+      },
+      complete: () => {
+        this.checkLoadingComplete();
+      }
     });
   }
 
+  private checkLoadingComplete(): void {
+    this.loadingCounter++;
+    if (this.loadingCounter >= this.TOTAL_LOADING_OPERATIONS) {
+      this.isLoading = false;
+      this.loadingCounter = 0; // Réinitialiser pour les futurs chargements
+    }
+  }
+
   loadSujet(id: number): void {
+    this.isLoading = true;
     this.sujetExamenService.getById(id).subscribe({
       next: (sujet) => {
         this.sujetForm.patchValue({

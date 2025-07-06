@@ -25,7 +25,7 @@ export class ListeOffresComponent implements OnInit {
 
   // Propriétés pour les filtres
   searchTerm = '';
-  selectedSecteurId: number | '' = '';
+  selectedSecteurId: string = '';
   selectedDuree = '';
   selectedLocalisation = '';
   selectedStatut = '';
@@ -62,11 +62,22 @@ export class ListeOffresComponent implements OnInit {
     this.loading = true;
     this.offreStageService.getAllOffres().subscribe({
       next: (response: PaginatedResponse<OffreStage>) => {
-        this.offres = response.data;
-        this.filteredOffres = this.offres;
+        this.offres = response.data.map(offre => {
+          // Associer le secteur correspondant si disponible
+          if (offre.secteur_id && this.secteurs.length > 0) {
+            offre.secteur = this.secteurs.find(s => s.id === offre.secteur_id);
+          }
+          return offre;
+        });
+        
+        this.filteredOffres = [...this.offres];
         this.totalOffres = response.total;
         this.paginationInfo = response;
         this.loading = false;
+        console.log('Offres chargées avec secteurs:', this.offres);
+        console.log('Secteurs disponibles:', this.secteurs);
+        console.log('Première offre secteur_id:', this.offres[0]?.secteur_id);
+        console.log('Première offre secteur:', this.offres[0]?.secteur);
       },
       error: (error: any) => {
         this.error = 'Erreur lors du chargement des offres';
@@ -77,6 +88,14 @@ export class ListeOffresComponent implements OnInit {
   }
 
   applyFilters(): void {
+    console.log('Applying filters:', {
+      searchTerm: this.searchTerm,
+      selectedSecteurId: this.selectedSecteurId,
+      selectedDuree: this.selectedDuree,
+      selectedLocalisation: this.selectedLocalisation,
+      selectedStatut: this.selectedStatut
+    });
+
     this.filteredOffres = this.offres.filter(offre => {
       const matchesSearch = !this.searchTerm || 
         offre.titre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -84,7 +103,9 @@ export class ListeOffresComponent implements OnInit {
         offre.entreprise?.nom.toLowerCase().includes(this.searchTerm.toLowerCase());
 
       const matchesSecteur = !this.selectedSecteurId || 
-        offre.secteur_id === this.selectedSecteurId;
+        offre.secteur_id === parseInt(this.selectedSecteurId);
+
+      console.log(`Offre ${offre.id_offre_stage}: secteur_id=${offre.secteur_id}, selectedSecteurId=${this.selectedSecteurId}, matchesSecteur=${matchesSecteur}`);
 
       const matchesDuree = !this.selectedDuree || 
         (offre.duree ? this.matchesDuree(offre.duree, this.selectedDuree) : false);
@@ -98,6 +119,8 @@ export class ListeOffresComponent implements OnInit {
       return matchesSearch && matchesSecteur && matchesDuree && 
              matchesLocalisation && matchesStatut;
     });
+
+    console.log('Filtered offres count:', this.filteredOffres.length);
   }
 
   matchesDuree(offreDuree: string, selectedDuree: string): boolean {
@@ -157,9 +180,25 @@ export class ListeOffresComponent implements OnInit {
   }
 
   loadSecteurs() {
-    this.offreStageService['http'].get<Secteur[]>(`${environment.apiUrl}/secteurs`).subscribe({
-      next: (secteurs) => this.secteurs = secteurs,
-      error: () => this.secteurs = []
+    this.offreStageService.getSecteurs().subscribe({
+      next: (secteurs) => {
+        this.secteurs = secteurs;
+        console.log('Secteurs chargés:', secteurs);
+        // Recharger les offres pour associer les secteurs
+        if (this.offres.length > 0) {
+          this.offres = this.offres.map(offre => {
+            if (offre.secteur_id) {
+              offre.secteur = this.secteurs.find(s => s.id === offre.secteur_id);
+            }
+            return offre;
+          });
+          this.filteredOffres = [...this.offres];
+        }
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des secteurs:', error);
+        this.secteurs = [];
+      }
     });
   }
 } 

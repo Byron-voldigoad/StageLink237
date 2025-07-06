@@ -11,7 +11,7 @@ class OffreStageController extends Controller
 {
     public function index(Request $request)
     {
-        $offres = OffreStage::with('entreprise')->paginate(6);
+        $offres = OffreStage::with(['entreprise', 'getSecteur'])->paginate(6);
         return response()->json($offres);
     }
 
@@ -46,14 +46,14 @@ class OffreStageController extends Controller
         }
 
         $offre = OffreStage::create($data);
-        $offre->load('entreprise');
+        $offre->load(['entreprise', 'getSecteur']);
         
         return response()->json($offre, 201);
     }
 
     public function show($id)
     {
-        $offre = OffreStage::with('entreprise')->findOrFail($id);
+        $offre = OffreStage::with(['entreprise', 'getSecteur'])->findOrFail($id);
         return response()->json($offre);
     }
 
@@ -90,7 +90,7 @@ class OffreStageController extends Controller
         }
 
         $offre->update($data);
-        $offre->load('entreprise');
+        $offre->load(['entreprise', 'getSecteur']);
 
         return response()->json($offre);
     }

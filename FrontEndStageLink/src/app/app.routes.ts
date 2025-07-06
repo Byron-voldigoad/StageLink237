@@ -53,7 +53,7 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'modifier/:id',
+        path: ':id/modifier',
         loadComponent: () =>
           import('./modules/stages/pages/form-offre/form-offre.component').then(
             (m) => m.FormOffreComponent
@@ -97,9 +97,9 @@ export const routes: Routes = [
   
   // ...add more as needed
 ];
-
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
+

@@ -19,7 +19,9 @@
         <label for="id_type" class="block text-sm font-medium text-gray-700">Type de sujet</label>
         <select id="id_type" formControlName="id_type" class="mt-1 block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
           <option value="">Sélectionnez un type</option>
-          <option *ngFor="let type of types" [value]="type.id_type">{{ type.nom }}</option>
+          <ng-container *ngIf="types">
+            <option *ngFor="let type of types" [value]="type.id_type">{{ type.nom }}</option>
+          </ng-container>
         </select>
       </div>
 
@@ -28,7 +30,9 @@
         <label for="id_matiere" class="block text-sm font-medium text-gray-700">Matière</label>
         <select id="id_matiere" formControlName="id_matiere" class="mt-1 block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
           <option value="">Sélectionnez une matière</option>
-          <option *ngFor="let matiere of matieres" [value]="matiere.id_matiere">{{ matiere.nom }}</option>
+          <ng-container *ngIf="matieres">
+            <option *ngFor="let matiere of matieres" [value]="matiere.id_matiere">{{ matiere.nom }}</option>
+          </ng-container>
         </select>
       </div>
 
@@ -37,7 +41,9 @@
         <label for="id_niveau" class="block text-sm font-medium text-gray-700">Niveau</label>
         <select id="id_niveau" formControlName="id_niveau" class="mt-1 block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
           <option value="">Sélectionnez un niveau</option>
-          <option *ngFor="let niveau of niveaux" [value]="niveau.id_niveau">{{ niveau.nom }}</option>
+          <ng-container *ngIf="niveaux">
+            <option *ngFor="let niveau of niveaux" [value]="niveau.id_niveau">{{ niveau.nom }}</option>
+          </ng-container>
         </select>
       </div>
 
@@ -46,7 +52,9 @@
         <label for="id_annee" class="block text-sm font-medium text-gray-700">Année académique</label>
         <select id="id_annee" formControlName="id_annee" class="mt-1 block w-full h-8 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
           <option value="">Sélectionnez une année</option>
-          <option *ngFor="let annee of annees" [value]="annee.id_annee">{{ annee.annee_debut }}-{{ annee.annee_fin }}</option>
+          <ng-container *ngIf="annees">
+            <option *ngFor="let annee of annees" [value]="annee.id_annee">{{ annee.annee_debut }}-{{ annee.annee_fin }}</option>
+          </ng-container>
         </select>
       </div>
 

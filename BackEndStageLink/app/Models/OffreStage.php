@@ -23,9 +23,12 @@ class OffreStage extends Model
         'date_fin',
         'localisation',
         'remuneration',
-        'secteur',
+        'secteur_id',
         'statut'
     ];
+    
+    // Masquer l'ancien champ secteur du modèle
+    protected $hidden = ['secteur', 'getSecteur'];
 
     protected $casts = [
         'date_debut' => 'datetime',
@@ -35,20 +38,24 @@ class OffreStage extends Model
         'date_modification' => 'datetime'
     ];
 
-    protected $with = ['entreprise'];
+    // Charger automatiquement ces relations
+    protected $with = ['entreprise', 'getSecteur'];
+    
+    // S'assurer que le champ secteur n'est pas rempli lors de la création/mise à jour
+    protected $guarded = ['secteur'];
 
     public function entreprise()
     {
         return $this->belongsTo(Entreprise::class, 'id_entreprise', 'id_entreprise');
     }
+    
+    public function getSecteur()
+    {
+        return $this->belongsTo(Secteur::class, 'secteur_id', 'id');
+    }
 
     public function candidatures()
     {
         return $this->hasMany(Candidature::class);
-    }
-
-    public function secteur()
-    {
-        return $this->belongsTo(Secteur::class, 'secteur_id');
     }
 }

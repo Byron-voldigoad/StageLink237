@@ -58,7 +58,7 @@
       <!-- Secteur -->
       <div class="w-full">
         <label class="block text-sm font-medium text-gray-700">Secteur</label>
-        <select [(ngModel)]="selectedSecteurId" class="block h-8 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
+        <select [(ngModel)]="selectedSecteurId" (change)="applyFilters()" class="block h-8 w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
           <option value="">Tous les secteurs</option>
           <option *ngFor="let secteur of secteurs" [value]="secteur.id">{{ secteur.nom }}</option>
         </select>

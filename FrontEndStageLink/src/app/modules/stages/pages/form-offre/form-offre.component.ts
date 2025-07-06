@@ -215,12 +215,19 @@ export class FormOffreComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadEntreprises();
+    // Charger d'abord les secteurs
     this.loadSecteurs();
+    
+    // Puis charger les entreprises
+    this.loadEntreprises();
+    
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.isEditMode = true;
-      this.loadOffre(parseInt(id, 10));
+      // Délai pour s'assurer que les secteurs sont chargés
+      setTimeout(() => {
+        this.loadOffre(parseInt(id, 10));
+      }, 100);
     }
   }
 
@@ -238,8 +245,14 @@ export class FormOffreComponent implements OnInit {
 
   loadSecteurs(): void {
     this.offreStageService['http'].get<Secteur[]>(`${environment.apiUrl}/secteurs`).subscribe({
-      next: (secteurs) => this.secteurs = secteurs,
-      error: () => this.secteurs = []
+      next: (secteurs) => {
+        this.secteurs = secteurs;
+        console.log('Secteurs chargés:', secteurs);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des secteurs:', error);
+        this.secteurs = [];
+      }
     });
   }
 
@@ -256,14 +269,34 @@ export class FormOffreComponent implements OnInit {
         const dateDebut = offre.date_debut ? new Date(offre.date_debut).toISOString().split('T')[0] : '';
         const dateFin = offre.date_fin ? new Date(offre.date_fin).toISOString().split('T')[0] : '';
 
+        console.log('Données de l\'offre chargées:', offre); // Log pour le débogage
+
+        // Déterminer l'ID du secteur (peut provenir de secteur_id ou de l'objet secteur)
+        let secteurId = null;
+        if (offre.secteur_id) {
+          secteurId = offre.secteur_id;
+        } else if (offre.secteur) {
+          // Si l'API renvoie un objet secteur complet
+          secteurId = typeof offre.secteur === 'object' ? offre.secteur.id : offre.secteur;
+        }
+
+        console.log('Secteur ID déterminé:', secteurId);
+
         // Mettre à jour le formulaire avec les valeurs formatées
-        this.offreForm.patchValue({
+        const formValues = {
           ...offre,
           duree_nombre: dureeNombre,
           duree_unite: dureeUnite,
           date_debut: dateDebut,
-          date_fin: dateFin
-        });
+          date_fin: dateFin,
+          secteur_id: secteurId
+        };
+
+        console.log('Valeurs du formulaire avant patchValue:', formValues);
+        
+        this.offreForm.patchValue(formValues);
+
+        console.log('Formulaire après patchValue:', this.offreForm.value); // Log pour le débogage
 
         // Mettre à jour les compétences
         this.selectedCompetences = offre.competences_requises?.split(',').map(c => c.trim()) || [];

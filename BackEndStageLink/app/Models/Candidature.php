@@ -10,20 +10,21 @@ class Candidature extends Model
     use HasFactory;
 
     protected $fillable = [
-        'offre_stage_id',
-        'etudiant_id',
+        'id_offre_stage',
+        'id_etudiant',
         'cv_path',
         'lettre_motivation_path',
+        'message_motivation',
         'statut'
     ];
 
     public function offreStage()
     {
-        return $this->belongsTo(OffreStage::class);
+        return $this->belongsTo(OffreStage::class, 'id_offre_stage', 'id_offre_stage');
     }
 
     public function etudiant()
     {
-        return $this->belongsTo(ProfilEtudiant::class, 'etudiant_id');
+        return $this->belongsTo(ProfilEtudiant::class, 'id_etudiant', 'id_etudiant');
     }
 }

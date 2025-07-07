@@ -34,6 +34,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('langues', [LangueController::class, 'index']);
 Route::get('secteurs', [SecteurController::class, 'index']);
 
+// Routes publiques pour les offres de stage (pour permettre l'affichage sans authentification)
+Route::get('offres-stage', [App\Http\Controllers\OffreStageController::class, 'index']);
+Route::get('offres-stage/{id}', [App\Http\Controllers\OffreStageController::class, 'show']);
+
+// Routes spécifiques pour les candidatures (temporairement sans auth pour test)
+Route::prefix('candidatures')->group(function () {
+    Route::post('/postuler', [App\Http\Controllers\CandidatureController::class, 'postuler']);
+    Route::get('/offre/{offreId}', [App\Http\Controllers\CandidatureController::class, 'getCandidaturesByOffre']);
+    Route::get('/etudiant/{etudiantId}', [App\Http\Controllers\CandidatureController::class, 'getCandidaturesByEtudiant']);
+});
+
 // Toutes les autres routes sont protégées par auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
@@ -53,7 +64,6 @@ Route::middleware('auth:sanctum')->group(function () {
         'matieres' => 'App\Http\Controllers\MatiereController',
         'tuteur-matieres' => 'App\Http\Controllers\TuteurMatiereController',
         'entreprises' => 'App\Http\Controllers\EntrepriseController',
-        'offres-stage' => 'App\Http\Controllers\OffreStageController',
         'candidatures' => 'App\Http\Controllers\CandidatureController',
         'sujets-examen' => 'App\Http\Controllers\SujetExamenController',
         'niveaux' => 'App\Http\Controllers\NiveauController',
@@ -66,6 +76,11 @@ Route::middleware('auth:sanctum')->group(function () {
         'soumissions-etudiants' => 'App\Http\Controllers\SoumissionEtudiantController',
         'tutorats' => 'App\Http\Controllers\TutoratController',
     ]);
+
+    // Routes protégées pour les offres de stage (création, modification, suppression)
+    Route::post('offres-stage', [App\Http\Controllers\OffreStageController::class, 'store']);
+    Route::put('offres-stage/{id}', [App\Http\Controllers\OffreStageController::class, 'update']);
+    Route::delete('offres-stage/{id}', [App\Http\Controllers\OffreStageController::class, 'destroy']);
 
     // Routes pour les entreprises
     Route::apiResource('entreprises', EntrepriseController::class);

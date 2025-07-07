@@ -5,294 +5,15 @@ import { OffreStageService } from '../../services/offre-stage.service';
 import { OffreStage } from '../../models/offre-stage.model';
 import { MapComponent } from '../../../../shared/components/map/map.component';
 import { GeocodingService } from '../../../../shared/services/geocoding.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { PostulerOffreComponent } from '../../components/postuler-offre/postuler-offre.component';
 
 @Component({
   selector: 'app-detail-offre',
   standalone: true,
-  imports: [CommonModule, RouterModule, MapComponent],
-  template: `
-    <div class="min-h-screen bg-gray-50 py-6 sm:py-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Loading Spinner -->
-        <div *ngIf="loading" class="flex justify-center items-center min-h-[400px]">
-          <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500"></div>
-        </div>
-
-        <!-- Error Message -->
-        <div *ngIf="error" 
-             class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md shadow-sm">
-          <div class="flex items-center">
-            <svg class="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>{{ error }}</span>
-          </div>
-        </div>
-
-        <!-- Offre Content -->
-        <div *ngIf="offre" class="space-y-6">
-          <!-- Header Section -->
-          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div class="p-6 sm:p-8">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                <!-- Title and Company Info -->
-                <div class="flex items-start space-x-4">
-                  <div class="flex-shrink-0">
-                    <div *ngIf="offre.entreprise?.logo_path" class="h-16 w-16 rounded-full overflow-hidden">
-                      <img [src]="offre.entreprise?.logo_path || ''" 
-                           [alt]="offre.entreprise?.nom || 'Logo entreprise'"
-                           class="h-full w-full object-cover">
-                    </div>
-                    <div *ngIf="!offre.entreprise?.logo_path" 
-                         class="h-16 w-16 rounded-full bg-red-100 flex items-center justify-center">
-                      <span class="text-2xl text-red-600 font-semibold">
-                        {{ offre.entreprise?.nom?.charAt(0) || 'E' }}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{{ offre.titre }}</h1>
-                    <p class="text-lg text-gray-600">{{ offre.entreprise?.nom || 'Entreprise non spécifiée' }}</p>
-                  </div>
-                </div>
-
-                <!-- Status and Actions -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                  <span [ngClass]="{
-                    'bg-green-100 text-green-800': offre.statut === 'ouvert',
-                    'bg-red-100 text-red-800': offre.statut === 'ferme',
-                    'bg-accent/10 text-accent-dark': offre.statut === 'en_attente'
-                  }" class="px-4 py-2 rounded-full text-sm font-semibold inline-flex items-center">
-                    <span class="w-2 h-2 rounded-full mr-2" [ngClass]="{
-                      'bg-green-500': offre.statut === 'ouvert',
-                      'bg-red-500': offre.statut === 'ferme',
-                      'bg-accent': offre.statut === 'en_attente'
-                    }"></span>
-                    {{ offre.statut }}
-                  </span>
-                  <div class="flex gap-3">
-                    <button 
-                      [routerLink]="['/stages', offre.id_offre_stage, 'modifier']"
-                      class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                      </svg>
-                      Modifier
-                    </button>
-                    <button 
-                      (click)="onDelete()"
-                      class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                      </svg>
-                      Supprimer
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Main Content Grid -->
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column -->
-            <div class="lg:col-span-2 space-y-6">
-              <!-- Description Section -->
-              <div class="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Description</h2>
-                <div class="prose max-w-none">
-                  <p class="text-gray-700 whitespace-pre-line">{{ offre.description }}</p>
-                </div>
-              </div>
-
-              <!-- Exigences Section -->
-              <div *ngIf="offre.exigences" class="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Exigences</h2>
-                <div class="prose max-w-none">
-                  <p class="text-gray-700 whitespace-pre-line">{{ offre.exigences }}</p>
-                </div>
-              </div>
-
-              <!-- Compétences Section -->
-              <div *ngIf="offre.competences_requises" class="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-4">Compétences requises</h2>
-                <div class="flex flex-wrap gap-2">
-                  <span *ngFor="let competence of getCompetences(offre.competences_requises)" 
-                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                    {{ competence }}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Right Column -->
-            <div class="space-y-6">
-              <!-- Informations pratiques -->
-              <div class="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">Informations pratiques</h2>
-                <div class="space-y-4">
-                  <div *ngIf="offre.entreprise?.adresse" class="flex items-start">
-                    <div class="flex-shrink-0">
-                      <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="ml-4">
-                      <h3 class="text-sm font-medium text-gray-900">Localisation</h3>
-                      <div class="mt-1">
-                        <p class="text-sm text-gray-500 mb-1">Cliquez pour voir la localisation et l'itinéraire</p>
-                        <button (click)="showMap()" 
-                                class="text-sm text-red-600 hover:text-red-700 flex items-center cursor-pointer group">
-                          <span>{{ offre.entreprise?.adresse }}</span>
-                          <svg class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" 
-                               fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                  d="M9 5l7 7-7 7"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div *ngIf="offre.duree" class="flex items-start">
-                    <div class="flex-shrink-0">
-                      <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="ml-4">
-                      <h3 class="text-sm font-medium text-gray-900">Durée</h3>
-                      <p class="mt-1 text-sm text-gray-600">{{ offre.duree }}</p>
-                    </div>
-                  </div>
-
-                  <div *ngIf="offre.remuneration" class="flex items-start">
-                    <div class="flex-shrink-0">
-                      <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="ml-4">
-                      <h3 class="text-sm font-medium text-gray-900">Rémunération</h3>
-                      <p class="mt-1 text-sm" [ngClass]="getRemunerationClass()">
-                        {{ getRemunerationText(offre) }}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div *ngIf="offre.date_debut" class="flex items-start">
-                    <div class="flex-shrink-0">
-                      <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-100 text-red-600">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="ml-4">
-                      <h3 class="text-sm font-medium text-gray-900">Période</h3>
-                      <p class="mt-1 text-sm text-gray-600">
-                        Du {{ offre.date_debut | date }}
-                        <span *ngIf="offre.date_fin">au {{ offre.date_fin | date }}</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Action Button -->
-              <div *ngIf="offre.statut === 'ouvert'" class="bg-white rounded-xl shadow-sm p-6 sm:p-8">
-                <button class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                  Postuler
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Navigation -->
-          <div class="mt-8">
-            <button 
-              routerLink="/stages"
-              class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-              </svg>
-              Retour à la liste
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Map Sidebar -->
-      <div *ngIf="showMapSidebar" 
-           class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out z-50"
-           [class.translate-x-0]="showMapSidebar"
-           [class.translate-x-full]="!showMapSidebar">
-        <div class="h-full flex flex-col">
-          <!-- Header -->
-          <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h3 class="text-lg font-medium text-gray-900">Localisation</h3>
-            <button (click)="hideMap()" class="text-gray-500 hover:text-gray-700">
-              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Map Content -->
-          <div class="flex-1 overflow-hidden">
-            <div *ngIf="coordinates" class="h-full">
-              <app-map
-                [latitude]="coordinates.lat"
-                [longitude]="coordinates.lng"
-                [locationName]="offre?.entreprise?.adresse || ''"
-                [zoom]="13">
-              </app-map>
-            </div>
-          </div>
-
-          <!-- Itinerary Button -->
-          <div class="p-4 border-t border-gray-200">
-            <button (click)="openDirections()" 
-                    class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-              </svg>
-              Voir l'itinéraire
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Backdrop -->
-      <div *ngIf="showMapSidebar" 
-           class="fixed inset-y-0 right-0 w-full sm:w-96 bg-gray-900 bg-opacity-75 transition-opacity z-40"
-           (click)="hideMap()">
-      </div>
-    </div>
-  `,
-  styles: [`
-    :host {
-      display: block;
-    }
-  `]
+  imports: [CommonModule, RouterModule, MapComponent, PostulerOffreComponent],
+  templateUrl: './detail-offre.component.html',
+  styleUrls: ['./detail-offre.component.css']
 })
 export class DetailOffreComponent implements OnInit {
   offre: OffreStage | null = null;
@@ -300,15 +21,21 @@ export class DetailOffreComponent implements OnInit {
   loading = true;
   error: string | null = null;
   showMapSidebar = false;
+  showPostulerModal = false;
+  currentEtudiantId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private offreStageService: OffreStageService,
-    private geocodingService: GeocodingService
+    private geocodingService: GeocodingService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // Récupérer l'ID de l'étudiant connecté
+    this.currentEtudiantId = this.authService.getCurrentEtudiantId();
+    
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadOffre(parseInt(id));
@@ -400,5 +127,18 @@ export class DetailOffreComponent implements OnInit {
       const url = `https://www.google.com/maps/dir/?api=1&destination=${this.coordinates.lat},${this.coordinates.lng}&travelmode=driving`;
       window.open(url, '_blank');
     }
+  }
+
+  onPostuler(): void {
+    this.showPostulerModal = true;
+  }
+
+  closePostulerModal(): void {
+    this.showPostulerModal = false;
+  }
+
+  onCandidatureSubmitted(candidature: any): void {
+    console.log('Candidature soumise:', candidature);
+    // Ici vous pouvez ajouter une notification ou rediriger l'utilisateur
   }
 } 

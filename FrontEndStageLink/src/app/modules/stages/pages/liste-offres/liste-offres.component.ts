@@ -74,10 +74,6 @@ export class ListeOffresComponent implements OnInit {
         this.totalOffres = response.total;
         this.paginationInfo = response;
         this.loading = false;
-        console.log('Offres chargées avec secteurs:', this.offres);
-        console.log('Secteurs disponibles:', this.secteurs);
-        console.log('Première offre secteur_id:', this.offres[0]?.secteur_id);
-        console.log('Première offre secteur:', this.offres[0]?.secteur);
       },
       error: (error: any) => {
         this.error = 'Erreur lors du chargement des offres';
@@ -88,14 +84,6 @@ export class ListeOffresComponent implements OnInit {
   }
 
   applyFilters(): void {
-    console.log('Applying filters:', {
-      searchTerm: this.searchTerm,
-      selectedSecteurId: this.selectedSecteurId,
-      selectedDuree: this.selectedDuree,
-      selectedLocalisation: this.selectedLocalisation,
-      selectedStatut: this.selectedStatut
-    });
-
     this.filteredOffres = this.offres.filter(offre => {
       const matchesSearch = !this.searchTerm || 
         offre.titre.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -104,8 +92,6 @@ export class ListeOffresComponent implements OnInit {
 
       const matchesSecteur = !this.selectedSecteurId || 
         offre.secteur_id === parseInt(this.selectedSecteurId);
-
-      console.log(`Offre ${offre.id_offre_stage}: secteur_id=${offre.secteur_id}, selectedSecteurId=${this.selectedSecteurId}, matchesSecteur=${matchesSecteur}`);
 
       const matchesDuree = !this.selectedDuree || 
         (offre.duree ? this.matchesDuree(offre.duree, this.selectedDuree) : false);
@@ -119,8 +105,6 @@ export class ListeOffresComponent implements OnInit {
       return matchesSearch && matchesSecteur && matchesDuree && 
              matchesLocalisation && matchesStatut;
     });
-
-    console.log('Filtered offres count:', this.filteredOffres.length);
   }
 
   matchesDuree(offreDuree: string, selectedDuree: string): boolean {
@@ -183,7 +167,6 @@ export class ListeOffresComponent implements OnInit {
     this.offreStageService.getSecteurs().subscribe({
       next: (secteurs) => {
         this.secteurs = secteurs;
-        console.log('Secteurs chargés:', secteurs);
         // Recharger les offres pour associer les secteurs
         if (this.offres.length > 0) {
           this.offres = this.offres.map(offre => {

@@ -14,12 +14,10 @@ class AddSecteurIdToOffresStageTable extends Migration
     public function up()
     {
         Schema::table('offres_stage', function (Blueprint $table) {
-            // Ajouter la colonne secteur_id comme clé étrangère
-            $table->foreignId('secteur_id')
-                  ->nullable()
-                  ->after('remuneration')
-                  ->constrained('secteurs')
-                  ->onDelete('set null');
+            // Vérifier si la colonne n'existe pas déjà
+            if (!Schema::hasColumn('offres_stage', 'secteur_id')) {
+                $table->unsignedBigInteger('secteur_id')->nullable()->after('remuneration');
+            }
         });
 
         // Mettre à jour les enregistrements existants si nécessaire

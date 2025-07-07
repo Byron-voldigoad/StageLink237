@@ -143,6 +143,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // Création des offres de stage
+        $secteurs = DB::table('secteurs')->pluck('id', 'nom');
         $offres = [
             [
                 'id_entreprise' => 1,
@@ -154,7 +155,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-09-30',
                 'localisation' => 'Douala',
                 'remuneration' => 150000,
-                'secteur' => 'developpement_web',
+                'secteur_nom' => 'Développement web',
                 'competences_requises' => 'JavaScript, Angular, Node.js, MySQL',
                 'statut' => 'ouvert'
             ],
@@ -168,7 +169,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-12-31',
                 'localisation' => 'Yaoundé',
                 'remuneration' => 120000,
-                'secteur' => 'design_ui_ux',
+                'secteur_nom' => 'Design UI/UX',
                 'competences_requises' => 'Marketing Digital, Réseaux Sociaux, Content Marketing',
                 'statut' => 'ouvert'
             ],
@@ -182,7 +183,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-11-30',
                 'localisation' => 'Douala',
                 'remuneration' => 180000,
-                'secteur' => 'data_science',
+                'secteur_nom' => 'Data Science',
                 'competences_requises' => 'Python, SQL, Power BI, Statistiques',
                 'statut' => 'ouvert'
             ],
@@ -196,7 +197,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-10-15',
                 'localisation' => 'Yaoundé',
                 'remuneration' => 140000,
-                'secteur' => 'design_ui_ux',
+                'secteur_nom' => 'Design UI/UX',
                 'competences_requises' => 'Figma, Adobe XD, UI/UX Design, Prototypage',
                 'statut' => 'ouvert'
             ],
@@ -210,7 +211,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2025-01-31',
                 'localisation' => 'Douala',
                 'remuneration' => 200000,
-                'secteur' => 'cloud_computing',
+                'secteur_nom' => 'Cloud Computing',
                 'competences_requises' => 'Docker, Kubernetes, CI/CD, Linux',
                 'statut' => 'ouvert'
             ],
@@ -224,7 +225,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-12-15',
                 'localisation' => 'Douala',
                 'remuneration' => 160000,
-                'secteur' => 'developpement_mobile',
+                'secteur_nom' => 'Développement mobile',
                 'competences_requises' => 'React Native, Flutter, Android, iOS',
                 'statut' => 'ouvert'
             ],
@@ -238,7 +239,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-09-30',
                 'localisation' => 'Yaoundé',
                 'remuneration' => 100000,
-                'secteur' => 'design_ui_ux',
+                'secteur_nom' => 'Design UI/UX',
                 'competences_requises' => 'SEO, Google Ads, Analytics, Content Marketing',
                 'statut' => 'ouvert'
             ],
@@ -252,7 +253,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2025-02-28',
                 'localisation' => 'Douala',
                 'remuneration' => 220000,
-                'secteur' => 'cloud_computing',
+                'secteur_nom' => 'Cloud Computing',
                 'competences_requises' => 'AWS, Azure, Cloud Architecture, Security',
                 'statut' => 'ouvert'
             ],
@@ -266,7 +267,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-12-31',
                 'localisation' => 'Yaoundé',
                 'remuneration' => 180000,
-                'secteur' => 'gestion_de_projet',
+                'secteur_nom' => 'Gestion de projet',
                 'competences_requises' => 'Agile, Scrum, Product Strategy, User Research',
                 'statut' => 'ouvert'
             ],
@@ -280,7 +281,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-11-15',
                 'localisation' => 'Douala',
                 'remuneration' => 190000,
-                'secteur' => 'cybersecurite',
+                'secteur_nom' => 'Cybersecurite',
                 'competences_requises' => 'Network Security, Penetration Testing, Security Analysis',
                 'statut' => 'ouvert'
             ],
@@ -294,7 +295,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2025-02-28',
                 'localisation' => 'Douala',
                 'remuneration' => 250000,
-                'secteur' => 'intelligence_artificielle',
+                'secteur_nom' => 'Intelligence artificielle',
                 'competences_requises' => 'Python, TensorFlow, PyTorch, Machine Learning',
                 'statut' => 'ouvert'
             ],
@@ -308,7 +309,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-09-30',
                 'localisation' => 'Yaoundé',
                 'remuneration' => 90000,
-                'secteur' => 'design_ui_ux',
+                'secteur_nom' => 'Design UI/UX',
                 'competences_requises' => 'Rédaction Web, SEO, Social Media, Storytelling',
                 'statut' => 'ouvert'
             ],
@@ -322,7 +323,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-11-30',
                 'localisation' => 'Douala',
                 'remuneration' => 130000,
-                'secteur' => 'developpement_web',
+                'secteur_nom' => 'Développement web',
                 'competences_requises' => 'Testing, Selenium, JIRA, Test Automation',
                 'statut' => 'ouvert'
             ],
@@ -336,7 +337,7 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2025-01-31',
                 'localisation' => 'Yaoundé',
                 'remuneration' => 150000,
-                'secteur' => 'gestion_de_projet',
+                'secteur_nom' => 'Gestion de projet',
                 'competences_requises' => 'UML, BPMN, Requirements Analysis, Documentation',
                 'statut' => 'ouvert'
             ],
@@ -350,12 +351,19 @@ class DatabaseSeeder extends Seeder
                 'date_fin' => '2024-10-15',
                 'localisation' => 'Douala',
                 'remuneration' => 110000,
-                'secteur' => 'developpement_web',
+                'secteur_nom' => 'Développement web',
                 'competences_requises' => 'Technical Writing, Documentation, API Documentation',
                 'statut' => 'ouvert'
             ]
         ];
-
+        // Remplacer les secteurs par secteur_id
+        foreach ($offres as &$offreData) {
+            if (isset($offreData['secteur_nom']) && isset($secteurs[$offreData['secteur_nom']])) {
+                $offreData['secteur_id'] = $secteurs[$offreData['secteur_nom']];
+            }
+            unset($offreData['secteur_nom']);
+        }
+        unset($offreData);
         foreach ($offres as $offreData) {
             OffreStage::create($offreData);
         }

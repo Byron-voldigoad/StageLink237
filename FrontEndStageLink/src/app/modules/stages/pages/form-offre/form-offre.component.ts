@@ -10,6 +10,7 @@ import { Entreprise } from '../../../../models/entreprise.model';
 import { Secteur } from '../../models/secteur.model';
 import { environment } from 'src/environments/environment';
 
+
 interface CompetenceGroup {
   label: string;
   competences: string[];
@@ -196,7 +197,8 @@ export class FormOffreComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private offreStageService: OffreStageService,
-    private entrepriseService: EntrepriseService
+    private entrepriseService: EntrepriseService,
+
   ) {
     this.offreForm = this.fb.group({
       id_entreprise: ['', Validators.required],
@@ -373,4 +375,6 @@ export class FormOffreComponent implements OnInit {
     });
     }
   }
+
+
 } 

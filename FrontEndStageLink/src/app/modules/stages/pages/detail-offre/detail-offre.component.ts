@@ -8,11 +8,13 @@ import { GeocodingService } from '../../../../shared/services/geocoding.service'
 import { AuthService } from 'src/app/auth/auth.service';
 import { PostulerOffreComponent } from '../../components/postuler-offre/postuler-offre.component';
 import { CandidatureService, Candidature } from '../../services/candidature.service';
+import { AIAssistantComponent } from '../../../../shared/components/ai-assistant/ai-assistant.component';
+import { GeminiService, OffreStageAnalysis } from '../../../../core/services/gemini.service';
 
 @Component({
   selector: 'app-detail-offre',
   standalone: true,
-  imports: [CommonModule, RouterModule, MapComponent, PostulerOffreComponent],
+  imports: [CommonModule, RouterModule, MapComponent, PostulerOffreComponent, AIAssistantComponent],
   templateUrl: './detail-offre.component.html',
   styleUrls: ['./detail-offre.component.css']
 })
@@ -26,13 +28,21 @@ export class DetailOffreComponent implements OnInit {
   currentEtudiantId: number | null = null;
   candidatureExistante: Candidature | null = null;
 
+  // Ajout pour la liste des candidats
+  candidats: any[] = [];
+  candidatsLoading = false;
+  candidatsError: string | null = null;
+  activeTab: 'detail' | 'candidats' = 'detail';
+  viewMode: 'table' | 'cards' = 'table';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private offreStageService: OffreStageService,
     private geocodingService: GeocodingService,
     private authService: AuthService,
-    private candidatureService: CandidatureService
+    private candidatureService: CandidatureService,
+    private geminiService: GeminiService
   ) {}
 
   ngOnInit(): void {
@@ -156,5 +166,41 @@ export class DetailOffreComponent implements OnInit {
   onCandidatureSubmitted(candidature: any): void {
     console.log('Candidature soumise:', candidature);
     // Ici vous pouvez ajouter une notification ou rediriger l'utilisateur
+  }
+
+  // Méthodes pour l'IA
+  onAIAnalysisResult(analysis: OffreStageAnalysis): void {
+    console.log('Analyse IA reçue:', analysis);
+    // Ici vous pouvez traiter les résultats de l'analyse IA
+  }
+
+  // Ajout : méthode pour charger les candidats
+  loadCandidats(): void {
+    if (!this.offre) return;
+    this.candidatsLoading = true;
+    this.candidatsError = null;
+    this.candidatureService.getCandidaturesByOffre(this.offre.id_offre_stage).subscribe({
+      next: (candidats: any) => {
+        this.candidats = Array.isArray(candidats) ? candidats : (candidats.data || []);
+        this.candidatsLoading = false;
+      },
+      error: (err) => {
+        this.candidatsError = "Erreur lors du chargement des candidats.";
+        this.candidatsLoading = false;
+      }
+    });
+  }
+
+  // Ajout : méthode pour changer d'onglet
+  setActiveTab(tab: 'detail' | 'candidats') {
+    this.activeTab = tab;
+    if (tab === 'candidats' && this.candidats.length === 0 && this.offre) {
+      this.loadCandidats();
+    }
+  }
+
+  // Ajout : méthode pour changer le mode d'affichage
+  setViewMode(mode: 'table' | 'cards') {
+    this.viewMode = mode;
   }
 } 

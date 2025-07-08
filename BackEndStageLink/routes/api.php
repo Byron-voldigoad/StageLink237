@@ -116,3 +116,16 @@ Route::middleware('auth:sanctum')->group(function () {
 // Route publique pour l'inscription utilisateur
 Route::post('utilisateurs', [App\Http\Controllers\UtilisateurController::class, 'store']);
 Route::post('entreprises', [App\Http\Controllers\EntrepriseController::class, 'store']);
+
+// Routes pour l'IA (protégées par authentification)
+Route::middleware('auth:sanctum')->prefix('ai')->group(function () {
+    Route::post('/analyze-offre', [App\Http\Controllers\AIController::class, 'analyzeOffreStage']);
+    // Alias pour compatibilité
+    Route::post('/gemini/analyse-offre', [App\Http\Controllers\AIController::class, 'analyzeOffreStage']);
+    Route::post('/analyze-candidature', [App\Http\Controllers\AIController::class, 'analyzeCandidature']);
+    Route::post('/tutorat-recommendations', [App\Http\Controllers\AIController::class, 'generateTutoratRecommendations']);
+    Route::post('/improve-description', [App\Http\Controllers\AIController::class, 'improveDescription']);
+    Route::post('/sujet-suggestions', [App\Http\Controllers\AIController::class, 'generateSujetSuggestions']);
+    Route::get('/intelligent-search', [App\Http\Controllers\AIController::class, 'intelligentSearch']);
+    Route::post('/generate-motivation', [App\Http\Controllers\AIController::class, 'generateMotivation']);
+});

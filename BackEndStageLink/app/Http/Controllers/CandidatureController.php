@@ -125,9 +125,10 @@ class CandidatureController extends Controller
     // Méthodes spécifiques
     public function getCandidaturesByOffre($offreId)
     {
-        $candidatures = Candidature::with(['etudiant'])
+        $candidatures = Candidature::with(['etudiant.utilisateur'])
             ->where('id_offre_stage', $offreId)
-            ->paginate(10);
+            ->orderByDesc('created_at')
+            ->get();
         return response()->json($candidatures);
     }
 

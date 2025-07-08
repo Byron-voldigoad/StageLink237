@@ -8,12 +8,12 @@ import { PaginatedResponse } from '../../../../core/models/pagination.model';
 import { Secteur } from '../../models/secteur.model';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/auth/auth.service';
-import { PostulerOffreComponent } from '../../components/postuler-offre/postuler-offre.component';
+
 
 @Component({
   selector: 'app-liste-offres',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PostulerOffreComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './liste-offres.component.html',
   styleUrls: ['./liste-offres.component.css']
 })

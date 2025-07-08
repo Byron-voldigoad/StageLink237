@@ -244,23 +244,7 @@ export class MesPostulationsComponent implements OnInit {
     }
   }
 
-  /**
-   * Retourne le titre de l'offre
-   */
-  getOffreTitle(): string {
-    if (!this.editingCandidature) return '';
-    return this.offresMap[this.editingCandidature.id_offre_stage]?.titre || 
-           'Offre #' + this.editingCandidature.id_offre_stage;
-  }
 
-  /**
-   * Retourne le nom de l'entreprise
-   */
-  getOffreEntreprise(): string {
-    if (!this.editingCandidature) return '';
-    return this.offresMap[this.editingCandidature.id_offre_stage]?.entreprise?.nom || 
-           'Entreprise non spécifiée';
-  }
 
   /**
    * Retourne l'URL d'un fichier
@@ -296,5 +280,37 @@ export class MesPostulationsComponent implements OnInit {
       month: '2-digit',
       year: 'numeric'
     });
+  }
+
+  /**
+   * Retourne le titre de l'offre de manière sûre
+   */
+  getOffreTitle(offreId: number): string {
+    const offre = this.offresMap[offreId];
+    return offre && offre.titre ? offre.titre : `Offre #${offreId}`;
+  }
+
+  /**
+   * Retourne le nom de l'entreprise de manière sûre
+   */
+  getOffreEntreprise(offreId: number): string {
+    const offre = this.offresMap[offreId];
+    return offre && offre.entreprise && offre.entreprise.nom ? offre.entreprise.nom : 'Entreprise non spécifiée';
+  }
+
+  /**
+   * Retourne le titre du tutorat de manière sûre
+   */
+  getTutoratTitle(tutoratId: number): string {
+    const tutorat = this.tutoratsMap[tutoratId];
+    return tutorat && tutorat.titre ? tutorat.titre : `Tutorat #${tutoratId}`;
+  }
+
+  /**
+   * Retourne le domaine du tutorat de manière sûre
+   */
+  getTutoratDomaine(tutoratId: number): string {
+    const tutorat = this.tutoratsMap[tutoratId];
+    return tutorat && tutorat.domaine ? tutorat.domaine : 'Domaine non spécifié';
   }
 } 

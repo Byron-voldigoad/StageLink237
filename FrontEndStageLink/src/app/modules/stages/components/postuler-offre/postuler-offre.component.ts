@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CandidatureService } from '../../services/candidature.service';
+import { GeminiService } from 'src/app/core/services/gemini.service';
 
 @Component({
   selector: 'app-postuler-offre',
@@ -22,13 +23,15 @@ export class PostulerOffreComponent implements OnInit {
     lettre_motivation: null
   };
   loading = false;
+  loadingMotivation = false;
   error = '';
   success = '';
   showProfileButton = false;
 
   constructor(
     private fb: FormBuilder,
-    private candidatureService: CandidatureService
+    private candidatureService: CandidatureService,
+    private geminiService: GeminiService
   ) {}
 
   ngOnInit(): void {
@@ -126,5 +129,20 @@ export class PostulerOffreComponent implements OnInit {
 
   redirectToProfile(): void {
     window.location.href = '/profile/edit'; // À adapter selon le routing réel
+  }
+
+  genererMotivationIA(): void {
+    if (!this.offreId) return;
+    this.loadingMotivation = true;
+    this.geminiService.generateMotivation(this.offreId).subscribe({
+      next: (result) => {
+        this.candidatureForm.get('message_motivation')?.setValue(result.motivation);
+        this.loadingMotivation = false;
+      },
+      error: () => {
+        this.loadingMotivation = false;
+        this.error = 'Erreur lors de la génération IA de la motivation.';
+      }
+    });
   }
 } 

@@ -72,28 +72,32 @@ class ProfilsSeeder extends Seeder
         ];
 
         foreach ($tuteurs as $tuteurData) {
-            // Créer l'utilisateur
-            $utilisateur = Utilisateur::create([
+            // Créer ou retrouver l'utilisateur
+            $utilisateur = Utilisateur::firstOrCreate(
+                ['email' => $tuteurData['email']],
+                [
                 'nom' => $tuteurData['nom'],
                 'prenom' => $tuteurData['prenom'],
-                'email' => $tuteurData['email'],
                 'mot_de_passe' => bcrypt('password'),
                 'telephone' => $tuteurData['telephone']
-            ]);
+                ]
+            );
 
-            // Créer le profil tuteur
-            $tuteur = ProfilTuteur::create([
-                'utilisateur_id' => $utilisateur->id_utilisateur,
+            // Créer ou retrouver le profil tuteur
+            $tuteur = ProfilTuteur::firstOrCreate(
+                ['utilisateur_id' => $utilisateur->id_utilisateur],
+                [
                 'bio' => $tuteurData['bio'],
                 'specialites' => $tuteurData['specialites'],
                 'tarif_horaire' => $tuteurData['tarif_horaire'],
                 'experience_annees' => rand(2, 15),
                 'diplomes' => 'Master, Doctorat',
                 'methodes_pedagogiques' => 'Approche personnalisée, exercices pratiques'
-            ]);
+                ]
+            );
 
-            // Assigner le rôle
-            UtilisateurRole::create([
+            // Assigner le rôle si pas déjà fait
+            UtilisateurRole::firstOrCreate([
                 'utilisateur_id' => $utilisateur->id_utilisateur,
                 'role_id' => $roleTuteur->id_role
             ]);
@@ -144,26 +148,34 @@ class ProfilsSeeder extends Seeder
         ];
 
         foreach ($etudiants as $etudiantData) {
-            // Créer l'utilisateur
-            $utilisateur = Utilisateur::create([
+            // Créer ou retrouver l'utilisateur
+            $utilisateur = Utilisateur::firstOrCreate(
+                ['email' => $etudiantData['email']],
+                [
                 'nom' => $etudiantData['nom'],
                 'prenom' => $etudiantData['prenom'],
-                'email' => $etudiantData['email'],
                 'mot_de_passe' => bcrypt('password'),
-                'telephone' => $etudiantData['telephone']
-            ]);
+                    'telephone' => $etudiantData['telephone'] ?? null
+                ]
+            );
 
-            // Créer le profil étudiant
-            $etudiant = ProfilEtudiant::create([
-                'utilisateur_id' => $utilisateur->id_utilisateur,
-                'niveau_etude' => $etudiantData['niveau_etude'],
-                'etablissement' => $etudiantData['etablissement'],
-                'specialite' => 'Informatique, Mathématiques',
-                'objectifs' => 'Améliorer mes compétences en programmation'
-            ]);
+            // Créer ou retrouver le profil étudiant avec uniquement les champs existants
+            $etudiant = ProfilEtudiant::firstOrCreate(
+                ['utilisateur_id' => $utilisateur->id_utilisateur],
+                [
+                    'niveau_etude' => $etudiantData['niveau_etude'] ?? 'N/A',
+                    'etablissement' => $etudiantData['etablissement'] ?? 'Etablissement inconnu',
+                    'specialite' => $etudiantData['specialite'] ?? 'Informatique',
+                    'objectifs' => 'Améliorer mes compétences en programmation',
+                    'adresse' => $etudiantData['adresse'] ?? 'Adresse inconnue',
+                    'cv_path' => null,
+                    'photo_profil' => null,
+                    'credits' => 0
+                ]
+            );
 
-            // Assigner le rôle
-            UtilisateurRole::create([
+            // Assigner le rôle si pas déjà fait
+            UtilisateurRole::firstOrCreate([
                 'utilisateur_id' => $utilisateur->id_utilisateur,
                 'role_id' => $roleEtudiant->id_role
             ]);

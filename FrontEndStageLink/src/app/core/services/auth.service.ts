@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { map, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   id: number;
@@ -11,24 +14,26 @@ export interface User {
   entreprise_id?: number;
 }
 
+interface LoginResponse {
+  user: User;
+  token: string;
+  etudiant_id?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private apiUrl = environment.apiUrl;
+  private tokenKey = 'auth_token';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor() {
-    // Simuler un utilisateur connecté pour les tests
-    const mockUser: User = {
-      id: 1,
-      nom: 'Doe',
-      prenom: 'John',
-      email: 'john.doe@example.com',
-      role: 'etudiant',
-      etudiant_id: 1
-    };
-    this.currentUserSubject.next(mockUser);
+  constructor(private http: HttpClient) {
+    const user = localStorage.getItem('user');
+    if (user) {
+      this.currentUserSubject.next(JSON.parse(user));
+    }
   }
 
   getCurrentUser(): User | null {
@@ -57,25 +62,20 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<User> {
-    // Simulation d'une connexion
-    return new Observable(observer => {
-      setTimeout(() => {
-        const mockUser: User = {
-          id: 1,
-          nom: 'Doe',
-          prenom: 'John',
-          email: email,
-          role: 'etudiant',
-          etudiant_id: 1
-        };
-        this.currentUserSubject.next(mockUser);
-        observer.next(mockUser);
-        observer.complete();
-      }, 1000);
-    });
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap(response => {
+        localStorage.setItem(this.tokenKey, response.token);
+        const userWithEtudiantId: User = { ...response.user, etudiant_id: response.etudiant_id };
+        localStorage.setItem('user', JSON.stringify(userWithEtudiantId));
+        this.currentUserSubject.next(userWithEtudiantId);
+      }),
+      map(response => ({ ...response.user, etudiant_id: response.etudiant_id }))
+    );
   }
 
   logout(): void {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem('user');
     this.currentUserSubject.next(null);
   }
 } 

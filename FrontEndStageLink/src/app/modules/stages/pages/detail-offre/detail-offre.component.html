@@ -202,6 +202,19 @@
 
           <!-- Action Button -->
           <div *ngIf="offre.statut === 'ouvert'" class="bg-white rounded-xl shadow-sm p-6 sm:p-8">
+            <ng-container *ngIf="candidatureExistante; else postulerBtn">
+              <div class="flex flex-col items-center">
+                <span class="text-gray-700 font-medium mb-2">Vous avez déjà postulé à cette offre.</span>
+                <span [ngClass]="{
+                  'text-yellow-600': candidatureExistante.statut === 'en_attente',
+                  'text-green-600': candidatureExistante.statut === 'acceptee',
+                  'text-red-600': candidatureExistante.statut === 'refusee'
+                }" class="text-lg font-semibold">
+                  Statut : {{ candidatureExistante.statut | titlecase }}
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #postulerBtn>
             <button 
               (click)="onPostuler()"
               class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
@@ -211,6 +224,7 @@
               </svg>
               Postuler
             </button>
+            </ng-template>
           </div>
         </div>
       </div>

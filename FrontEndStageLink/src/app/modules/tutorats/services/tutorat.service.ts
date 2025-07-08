@@ -121,15 +121,11 @@ export class TutoratService {
   }): Observable<CandidatureTutorat> {
     const formData = new FormData();
     formData.append('etudiant_id', candidature.etudiant_id.toString());
-    
-    if (candidature.message_motivation) {
-      formData.append('message_motivation', candidature.message_motivation);
-    }
+    formData.append('message_motivation', candidature.message_motivation ?? '');
     
     if (candidature.cv) {
       formData.append('cv', candidature.cv);
     }
-    
     if (candidature.lettre_motivation) {
       formData.append('lettre_motivation', candidature.lettre_motivation);
     }
@@ -160,5 +156,10 @@ export class TutoratService {
   // Supprimer une séance
   deleteSeance(tutoratId: number, seanceId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${tutoratId}/seances/${seanceId}`);
+  }
+
+  // Récupérer les candidatures de tutorat d'un étudiant
+  getCandidaturesByEtudiant(etudiantId: number) {
+    return this.http.get<any[]>(`${environment.apiUrl}/candidatures-tutorat/etudiant/${etudiantId}`);
   }
 }

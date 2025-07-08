@@ -1,0 +1,451 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- En-tête de la page -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Mes Postulations</h1>
+          <p class="mt-2 text-gray-600">Suivez l'état de vos candidatures pour les stages et tutorats</p>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="bg-white rounded-lg shadow-sm px-4 py-2">
+            <span class="text-sm text-gray-500">Total</span>
+            <div class="text-2xl font-bold text-gray-900">
+              {{ (candidaturesStage?.length || 0) + (candidaturesTutorat?.length || 0) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message d'erreur si pas de profil étudiant -->
+    <div *ngIf="!etudiantId" class="mb-8">
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Profil étudiant requis</h3>
+            <p class="mt-1 text-sm text-red-700">Vous devez avoir un profil étudiant pour voir vos postulations.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div *ngIf="etudiantId" class="space-y-6">
+      <!-- Onglets -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="border-b border-gray-200">
+          <nav class="flex space-x-8 px-6" aria-label="Tabs">
+            <button 
+              (click)="setActiveTab('stages')"
+              [ngClass]="{
+                'border-blue-500 text-blue-600': activeTab === 'stages',
+                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'stages'
+              }"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+              </svg>
+              <span>Offres de Stage</span>
+              <span class="bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                {{ candidaturesStage?.length || 0 }}
+              </span>
+            </button>
+            <button 
+              (click)="setActiveTab('tutorats')"
+              [ngClass]="{
+                'border-purple-500 text-purple-600': activeTab === 'tutorats',
+                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'tutorats'
+              }"
+              class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2">
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              <span>Tutorats</span>
+              <span class="bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                {{ candidaturesTutorat?.length || 0 }}
+              </span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Filtres -->
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="text-sm font-medium text-gray-700">Filtrer par statut :</span>
+            <button 
+              (click)="setStatusFilter('all')"
+              [ngClass]="{
+                'bg-blue-100 text-blue-800': statusFilter === 'all',
+                'bg-gray-100 text-gray-700 hover:bg-gray-200': statusFilter !== 'all'
+              }"
+              class="px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200">
+              Tous
+            </button>
+            <button 
+              (click)="setStatusFilter('en_attente')"
+              [ngClass]="{
+                'bg-yellow-100 text-yellow-800': statusFilter === 'en_attente',
+                'bg-gray-100 text-gray-700 hover:bg-gray-200': statusFilter !== 'en_attente'
+              }"
+              class="px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 flex items-center space-x-1">
+              <span class="w-2 h-2 bg-yellow-400 rounded-full"></span>
+              <span>En attente</span>
+            </button>
+            <button 
+              (click)="setStatusFilter('acceptee')"
+              [ngClass]="{
+                'bg-green-100 text-green-800': statusFilter === 'acceptee',
+                'bg-gray-100 text-gray-700 hover:bg-gray-200': statusFilter !== 'acceptee'
+              }"
+              class="px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 flex items-center space-x-1">
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+              <span>Acceptées</span>
+            </button>
+            <button 
+              (click)="setStatusFilter('refusee')"
+              [ngClass]="{
+                'bg-red-100 text-red-800': statusFilter === 'refusee',
+                'bg-gray-100 text-gray-700 hover:bg-gray-200': statusFilter !== 'refusee'
+              }"
+              class="px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 flex items-center space-x-1">
+              <span class="w-2 h-2 bg-red-400 rounded-full"></span>
+              <span>Refusées</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Contenu des onglets -->
+        <div class="p-6">
+          <!-- Onglet Offres de Stage -->
+          <div *ngIf="activeTab === 'stages'">
+            <div *ngIf="getFilteredCandidaturesStage().length; else noStage" class="space-y-4">
+              <div *ngFor="let candidature of getFilteredCandidaturesStage()" class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-200">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-3 mb-2">
+                      <h3 class="text-lg font-medium text-gray-900 truncate">
+                        {{ offresMap[candidature.id_offre_stage]?.titre || 'Offre #' + candidature.id_offre_stage }}
+                      </h3>
+                      <span [ngClass]="{
+                        'bg-yellow-100 text-yellow-800': candidature.statut === 'en_attente',
+                        'bg-green-100 text-green-800': candidature.statut === 'acceptee',
+                        'bg-red-100 text-red-800': candidature.statut === 'refusee',
+                        'bg-gray-100 text-gray-800': candidature.statut === 'annulee'
+                      }" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                        <span *ngIf="candidature.statut === 'en_attente'" class="w-2 h-2 bg-yellow-400 rounded-full mr-1.5"></span>
+                        <span *ngIf="candidature.statut === 'acceptee'" class="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                        <span *ngIf="candidature.statut === 'refusee'" class="w-2 h-2 bg-red-400 rounded-full mr-1.5"></span>
+                        <span *ngIf="candidature.statut === 'annulee'" class="w-2 h-2 bg-gray-400 rounded-full mr-1.5"></span>
+                        {{ getStatutLabel(candidature.statut) }}
+                      </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                      <div class="flex items-center space-x-2">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                        <span>{{ offresMap[candidature.id_offre_stage]?.entreprise?.nom || 'Entreprise non spécifiée' }}</span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>{{ formatDate(candidature.created_at || candidature.date_creation) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center space-x-2 ml-4">
+                    <button 
+                      (click)="editCandidature(candidature, 'stage')"
+                      class="text-gray-400 hover:text-blue-600 transition-colors duration-200"
+                      title="Modifier la candidature">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                      </svg>
+                    </button>
+                    <button 
+                      (click)="deleteCandidature(candidature, 'stage')"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-200"
+                      title="Supprimer la candidature">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message si aucune candidature de stage -->
+            <ng-template #noStage>
+              <div class="text-center py-12">
+                <div class="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2-2v2m8 0V6a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2V6"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">
+                  {{ statusFilter === 'all' ? 'Aucune candidature de stage' : 'Aucune candidature avec ce statut' }}
+                </h3>
+                <p class="text-gray-500 mb-4">
+                  {{ statusFilter === 'all' ? 'Vous n\'avez pas encore postulé à des offres de stage.' : 'Aucune candidature ne correspond au filtre sélectionné.' }}
+                </p>
+                <a *ngIf="statusFilter === 'all'" routerLink="/stages" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
+                  <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  Voir les offres
+                </a>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- Onglet Tutorats -->
+          <div *ngIf="activeTab === 'tutorats'">
+            <div *ngIf="getFilteredCandidaturesTutorat().length; else noTutorat" class="space-y-4">
+              <div *ngFor="let candidature of getFilteredCandidaturesTutorat()" class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors duration-200">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-3 mb-2">
+                      <h3 class="text-lg font-medium text-gray-900 truncate">
+                        {{ tutoratsMap[candidature.tutorat_id]?.titre || 'Tutorat #' + candidature.tutorat_id }}
+                      </h3>
+                      <span [ngClass]="{
+                        'bg-yellow-100 text-yellow-800': candidature.statut === 'en_attente',
+                        'bg-green-100 text-green-800': candidature.statut === 'acceptee',
+                        'bg-red-100 text-red-800': candidature.statut === 'refusee',
+                        'bg-gray-100 text-gray-800': candidature.statut === 'annulee'
+                      }" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                        <span *ngIf="candidature.statut === 'en_attente'" class="w-2 h-2 bg-yellow-400 rounded-full mr-1.5"></span>
+                        <span *ngIf="candidature.statut === 'acceptee'" class="w-2 h-2 bg-green-400 rounded-full mr-1.5"></span>
+                        <span *ngIf="candidature.statut === 'refusee'" class="w-2 h-2 bg-red-400 rounded-full mr-1.5"></span>
+                        <span *ngIf="candidature.statut === 'annulee'" class="w-2 h-2 bg-gray-400 rounded-full mr-1.5"></span>
+                        {{ getStatutLabel(candidature.statut) }}
+                      </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                      <div class="flex items-center space-x-2">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        <span>{{ tutoratsMap[candidature.tutorat_id]?.domaine || 'Domaine non spécifié' }}</span>
+                      </div>
+                      <div class="flex items-center space-x-2">
+                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span>{{ formatDate(candidature.date_candidature) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center space-x-2 ml-4">
+                    <button 
+                      (click)="editCandidature(candidature, 'tutorat')"
+                      class="text-gray-400 hover:text-purple-600 transition-colors duration-200"
+                      title="Modifier la candidature">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                      </svg>
+                    </button>
+                    <button 
+                      (click)="deleteCandidature(candidature, 'tutorat')"
+                      class="text-gray-400 hover:text-red-600 transition-colors duration-200"
+                      title="Supprimer la candidature">
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message si aucune candidature de tutorat -->
+            <ng-template #noTutorat>
+              <div class="text-center py-12">
+                <div class="bg-gray-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">
+                  {{ statusFilter === 'all' ? 'Aucune candidature de tutorat' : 'Aucune candidature avec ce statut' }}
+                </h3>
+                <p class="text-gray-500 mb-4">
+                  {{ statusFilter === 'all' ? 'Vous n\'avez pas encore postulé à des tutorats.' : 'Aucune candidature ne correspond au filtre sélectionné.' }}
+                </p>
+                <a *ngIf="statusFilter === 'all'" routerLink="/tutorats" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
+                  <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  </svg>
+                  Voir les tutorats
+                </a>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'édition de candidature -->
+  <div *ngIf="showEditModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+      <div class="mt-3">
+        <!-- En-tête du modal -->
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-lg font-medium text-gray-900">
+            Modifier la candidature
+          </h3>
+          <button 
+            (click)="closeEditModal()"
+            class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Formulaire d'édition -->
+        <form (ngSubmit)="updateCandidature()" class="space-y-6">
+          <!-- Informations de la candidature -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-3">Informations de la candidature</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <span class="text-gray-500">Offre :</span>
+                <p class="font-medium">{{ getOffreTitle() }}</p>
+              </div>
+              <div>
+                <span class="text-gray-500">Entreprise :</span>
+                <p class="font-medium">{{ getOffreEntreprise() }}</p>
+              </div>
+              <div>
+                <span class="text-gray-500">Date de candidature :</span>
+                <p class="font-medium">{{ formatDate(editingCandidature?.created_at || editingCandidature?.date_creation) }}</p>
+              </div>
+              <div>
+                <span class="text-gray-500">Statut actuel :</span>
+                <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': editingCandidature?.statut === 'en_attente',
+                  'bg-green-100 text-green-800': editingCandidature?.statut === 'acceptee',
+                  'bg-red-100 text-red-800': editingCandidature?.statut === 'refusee',
+                  'bg-gray-100 text-gray-800': editingCandidature?.statut === 'annulee'
+                }" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                  {{ getStatutLabel(editingCandidature?.statut) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message de motivation -->
+          <div>
+            <label for="message_motivation" class="block text-sm font-medium text-gray-700 mb-2">
+              Message de motivation
+            </label>
+            <textarea 
+              id="message_motivation"
+              [(ngModel)]="editForm.message_motivation"
+              name="message_motivation"
+              rows="4"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Votre message de motivation..."></textarea>
+          </div>
+
+          <!-- Fichiers actuels -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="text-sm font-medium text-gray-700 mb-3">Fichiers actuels</h4>
+            <div class="space-y-3">
+              <div *ngIf="editingCandidature?.cv_path" class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  <span class="text-sm text-gray-600">CV actuel</span>
+                </div>
+                <a [href]="getFileUrl(editingCandidature.cv_path)" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                  Voir le fichier
+                </a>
+              </div>
+              <div *ngIf="editingCandidature?.lettre_motivation_path" class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                  <span class="text-sm text-gray-600">Lettre de motivation actuelle</span>
+                </div>
+                <a [href]="getFileUrl(editingCandidature.lettre_motivation_path)" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                  Voir le fichier
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nouveaux fichiers (optionnel) -->
+          <div>
+            <h4 class="text-sm font-medium text-gray-700 mb-3">Nouveaux fichiers (optionnel)</h4>
+            <div class="space-y-4">
+              <div>
+                <label for="new_cv" class="block text-sm font-medium text-gray-700 mb-2">
+                  Nouveau CV
+                </label>
+                <input 
+                  type="file" 
+                  id="new_cv"
+                  (change)="onFileSelected($event, 'cv')"
+                  accept=".pdf,.doc,.docx"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <p class="text-xs text-gray-500 mt-1">Formats acceptés : PDF, DOC, DOCX (max 2MB)</p>
+              </div>
+              <div>
+                <label for="new_lettre" class="block text-sm font-medium text-gray-700 mb-2">
+                  Nouvelle lettre de motivation
+                </label>
+                <input 
+                  type="file" 
+                  id="new_lettre"
+                  (change)="onFileSelected($event, 'lettre')"
+                  accept=".pdf,.doc,.docx"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                <p class="text-xs text-gray-500 mt-1">Formats acceptés : PDF, DOC, DOCX (max 2MB)</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="flex items-center justify-end space-x-3 pt-4 border-t border-gray-200">
+            <button 
+              type="button"
+              (click)="closeEditModal()"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+              Annuler
+            </button>
+            <button 
+              type="submit"
+              [disabled]="isUpdating"
+              class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="isUpdating" class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Mise à jour...
+              </span>
+              <span *ngIf="!isUpdating">Mettre à jour</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

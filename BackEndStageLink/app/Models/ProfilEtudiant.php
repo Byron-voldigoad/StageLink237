@@ -15,14 +15,12 @@ class ProfilEtudiant extends Model
     protected $keyType = 'int';
 
     protected $fillable = [
-        'id_utilisateur',
-        'prenom',
-        'nom',
-        'telephone',
+        'utilisateur_id',
+        'niveau_etude',
+        'etablissement',
+        'specialite',
+        'objectifs',
         'adresse',
-        'ecole',
-        'niveau',
-        'domaine_etude',
         'cv_path',
         'photo_profil',
         'credits'
@@ -36,7 +34,7 @@ class ProfilEtudiant extends Model
 
     public function utilisateur()
     {
-        return $this->belongsTo(User::class, 'id_utilisateur');
+        return $this->belongsTo(Utilisateur::class, 'utilisateur_id');
     }
 
     public function candidatures()

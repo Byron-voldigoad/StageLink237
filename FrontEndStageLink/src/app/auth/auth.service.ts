@@ -22,8 +22,10 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap(response => {
         localStorage.setItem(this.tokenKey, response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        this.userSubject.next(response.user);
+        // On stocke l'utilisateur enrichi avec etudiant_id
+        const userWithEtudiantId = { ...response.user, etudiant_id: response.etudiant_id };
+        localStorage.setItem('user', JSON.stringify(userWithEtudiantId));
+        this.userSubject.next(userWithEtudiantId);
       })
     );
   }
@@ -51,6 +53,11 @@ export class AuthService {
 
   getUser(): any {
     return this.userSubject.value;
+  }
+
+  getEtudiantId(): number | null {
+    const user = this.getUser();
+    return user && user.etudiant_id ? user.etudiant_id : null;
   }
 
   registerUser(data: any): Observable<any> {

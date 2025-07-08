@@ -5,8 +5,9 @@ import { OffreStageService } from '../../services/offre-stage.service';
 import { OffreStage } from '../../models/offre-stage.model';
 import { MapComponent } from '../../../../shared/components/map/map.component';
 import { GeocodingService } from '../../../../shared/services/geocoding.service';
-import { AuthService } from '../../../../core/services/auth.service';
+import { AuthService } from 'src/app/auth/auth.service';
 import { PostulerOffreComponent } from '../../components/postuler-offre/postuler-offre.component';
+import { CandidatureService, Candidature } from '../../services/candidature.service';
 
 @Component({
   selector: 'app-detail-offre',
@@ -23,19 +24,20 @@ export class DetailOffreComponent implements OnInit {
   showMapSidebar = false;
   showPostulerModal = false;
   currentEtudiantId: number | null = null;
+  candidatureExistante: Candidature | null = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private offreStageService: OffreStageService,
     private geocodingService: GeocodingService,
-    private authService: AuthService
+    private authService: AuthService,
+    private candidatureService: CandidatureService
   ) {}
 
   ngOnInit(): void {
     // Récupérer l'ID de l'étudiant connecté
-    this.currentEtudiantId = this.authService.getCurrentEtudiantId();
-    
+    this.currentEtudiantId = this.authService.getEtudiantId();
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadOffre(parseInt(id));
@@ -53,11 +55,25 @@ export class DetailOffreComponent implements OnInit {
         if (offre.entreprise?.adresse) {
           this.loadCoordinates(offre.entreprise.adresse);
         }
+        // Vérifier si l'étudiant a déjà postulé à cette offre
+        if (this.currentEtudiantId) {
+          this.candidatureService.getCandidaturesByEtudiant(this.currentEtudiantId).subscribe((candidatures: any) => {
+            let list: Candidature[] = [];
+            if (Array.isArray(candidatures)) {
+              list = candidatures;
+            } else if (candidatures && Array.isArray(candidatures.data)) {
+              list = candidatures.data;
+            }
+            console.log('Liste des candidatures:', list);
+            console.log('ID de l\'offre:', offre.id_offre_stage);
+            this.candidatureExistante = list.find((c: any) => c.id_offre_stage == offre.id_offre_stage) || null;
+            console.log('Candidature existante trouvée:', this.candidatureExistante);
+          });
+        }
       },
       error: (error) => {
         this.error = 'Erreur lors du chargement de l\'offre';
         this.loading = false;
-        console.error('Erreur:', error);
       }
     });
   }

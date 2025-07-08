@@ -43,6 +43,14 @@ class CandidatureController extends Controller
             ], 409);
         }
 
+        // Vérification explicite du profil étudiant
+        $profil = ProfilEtudiant::find($request->etudiant_id);
+        if (!$profil) {
+            return response()->json([
+                'message' => 'Vous devez créer un profil étudiant pour postuler à une offre.'
+            ], 403);
+        }
+
         $data = $request->all();
         $data['statut'] = $data['statut'] ?? 'en_attente';
         

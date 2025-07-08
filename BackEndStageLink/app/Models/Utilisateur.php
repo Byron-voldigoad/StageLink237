@@ -42,7 +42,7 @@ class Utilisateur extends Authenticatable
 
     public function profilEtudiant()
     {
-        return $this->hasOne(ProfilEtudiant::class, 'id_utilisateur', 'id_utilisateur');
+        return $this->hasOne(ProfilEtudiant::class, 'utilisateur_id', 'id_utilisateur');
     }
 
     public function profilTuteur()

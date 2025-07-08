@@ -45,6 +45,11 @@ Route::prefix('candidatures')->group(function () {
     Route::get('/etudiant/{etudiantId}', [App\Http\Controllers\CandidatureController::class, 'getCandidaturesByEtudiant']);
 });
 
+// Routes pour les candidatures de tutorat
+Route::prefix('candidatures-tutorat')->group(function () {
+    Route::get('/etudiant/{etudiantId}', [App\Http\Controllers\TutoratController::class, 'getCandidaturesByEtudiant']);
+});
+
 // Toutes les autres routes sont protégées par auth:sanctum
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);

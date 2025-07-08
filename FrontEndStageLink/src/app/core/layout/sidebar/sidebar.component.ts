@@ -34,4 +34,15 @@ export class SidebarComponent {
       this.router.navigate(['/login']);
     });
   }
+
+  get filteredMenuItems() {
+    if (this.user && this.user.etudiant_id) {
+      return [
+        ...this.menuItems.slice(0, 1),
+        { name: 'Mes postulations', icon: 'assignment', link: '/mes-postulations' },
+        ...this.menuItems.slice(1)
+      ];
+    }
+    return this.menuItems;
+  }
 }

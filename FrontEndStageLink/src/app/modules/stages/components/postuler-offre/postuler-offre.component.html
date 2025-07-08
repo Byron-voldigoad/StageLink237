@@ -66,7 +66,7 @@
             <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
-            {{ selectedFiles['cv']?.name }}
+            {{ selectedFiles['cv'] && selectedFiles['cv'].name }}
           </div>
           <div *ngIf="!selectedFiles['cv'] && candidatureForm.get('message_motivation')?.touched" 
                class="mt-1 text-sm text-red-600">
@@ -104,7 +104,7 @@
             <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
-            {{ selectedFiles['lettre_motivation']?.name }}
+            {{ selectedFiles['lettre_motivation'] && selectedFiles['lettre_motivation'].name }}
           </div>
         </div>
 
@@ -132,6 +132,13 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
             <span>{{ success }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="showProfileButton" class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4">
+          <div class="flex items-center justify-between">
+            <span>{{ error }}</span>
+            <button (click)="redirectToProfile()" class="ml-4 px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">Créer mon profil</button>
           </div>
         </div>
 

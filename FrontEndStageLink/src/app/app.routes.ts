@@ -92,6 +92,11 @@ export const routes: Routes = [
     path: 'profil',
     canActivate: [authGuard],
     loadComponent: () => import('./modules/etudiant/etudiant.component').then((m) => m.EtudiantComponent)
+  },
+  {
+    path: 'mes-postulations',
+    canActivate: [authGuard],
+    loadComponent: () => import('./modules/etudiant/mes-postulations/mes-postulations.component').then(m => m.MesPostulationsComponent)
   }
 
   

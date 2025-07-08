@@ -24,6 +24,7 @@ export class PostulerOffreComponent implements OnInit {
   loading = false;
   error = '';
   success = '';
+  showProfileButton = false;
 
   constructor(
     private fb: FormBuilder,
@@ -62,6 +63,13 @@ export class PostulerOffreComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Blocage si pas de profil étudiant
+    if (!this.etudiantId) {
+      this.error = 'Vous devez créer un profil étudiant pour postuler.';
+      this.showProfileButton = true;
+      return;
+    }
+
     // Vérifier que le CV est sélectionné
     if (!this.selectedFiles['cv']) {
       this.error = 'Le CV est requis.';
@@ -86,15 +94,8 @@ export class PostulerOffreComponent implements OnInit {
         formData.append('lettre_motivation_path', this.selectedFiles['lettre_motivation']);
       }
 
-      // Debug logging
-      console.log('FormData contents:');
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-      }
-
       this.candidatureService.postuler(formData).subscribe({
         next: (response) => {
-          console.log('Success response:', response);
           this.success = 'Votre candidature a été envoyée avec succès !';
           this.loading = false;
           setTimeout(() => {
@@ -103,7 +104,6 @@ export class PostulerOffreComponent implements OnInit {
           }, 2000);
         },
         error: (error) => {
-          console.error('Error response:', error);
           this.error = error.error?.message || 'Une erreur est survenue lors de l\'envoi de votre candidature.';
           this.loading = false;
         }
@@ -122,5 +122,9 @@ export class PostulerOffreComponent implements OnInit {
 
   onClose(): void {
     this.closeModal.emit();
+  }
+
+  redirectToProfile(): void {
+    window.location.href = '/profile/edit'; // À adapter selon le routing réel
   }
 } 

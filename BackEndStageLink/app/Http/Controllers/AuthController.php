@@ -24,9 +24,16 @@ class AuthController extends Controller
         // Création du token Sanctum
         $token = $user->createToken('authToken')->plainTextToken;
 
+        // On ne vérifie pas le profil étudiant, on renvoie juste l'utilisateur
+        $etudiantId = null;
+        if ($user->profilEtudiant) {
+            $etudiantId = $user->profilEtudiant->id_etudiant;
+        }
+
         return response()->json([
             'user' => $user,
-            'token' => $token
+            'token' => $token,
+            'etudiant_id' => $etudiantId
         ]);
     }
 

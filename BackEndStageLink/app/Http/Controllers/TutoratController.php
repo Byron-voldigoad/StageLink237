@@ -252,4 +252,17 @@ class TutoratController extends Controller
         $niveaux = \App\Models\Niveau::pluck('nom')->unique()->values();
         return response()->json($niveaux);
     }
+
+    /**
+     * Récupérer les candidatures de tutorat d'un étudiant
+     */
+    public function getCandidaturesByEtudiant($etudiantId): JsonResponse
+    {
+        $candidatures = CandidatureTutorat::with(['tutorat.tuteur.utilisateur'])
+            ->where('etudiant_id', $etudiantId)
+            ->orderBy('date_candidature', 'desc')
+            ->get();
+
+        return response()->json($candidatures);
+    }
 } 

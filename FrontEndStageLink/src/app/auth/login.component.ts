@@ -16,6 +16,7 @@ export class LoginComponent {
   password = '';
   error = '';
   loading = false;
+  etudiantId: number | null = null;
 
   constructor(private auth: AuthService, private router: Router) {}
 
@@ -25,6 +26,7 @@ export class LoginComponent {
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
         this.loading = false;
+        this.etudiantId = this.auth.getEtudiantId ? this.auth.getEtudiantId() : null;
         this.router.navigate(['/dashboard']);
       },
       error: err => {

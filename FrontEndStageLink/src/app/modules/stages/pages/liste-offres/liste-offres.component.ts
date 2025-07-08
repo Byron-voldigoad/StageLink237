@@ -7,11 +7,13 @@ import { OffreStage } from '../../models/offre-stage.model';
 import { PaginatedResponse } from '../../../../core/models/pagination.model';
 import { Secteur } from '../../models/secteur.model';
 import { environment } from 'src/environments/environment';
+import { AuthService } from 'src/app/auth/auth.service';
+import { PostulerOffreComponent } from '../../components/postuler-offre/postuler-offre.component';
 
 @Component({
   selector: 'app-liste-offres',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PostulerOffreComponent],
   templateUrl: './liste-offres.component.html',
   styleUrls: ['./liste-offres.component.css']
 })
@@ -51,11 +53,16 @@ export class ListeOffresComponent implements OnInit {
     'Nkongsamba'
   ];
 
-  constructor(private offreStageService: OffreStageService) {}
+  popupVisible = false;
+  offreSelectionnee: number | null = null;
+  etudiantId: number | null = null;
+
+  constructor(private offreStageService: OffreStageService, private authService: AuthService) {}
 
   ngOnInit(): void {
     this.loadSecteurs();
     this.loadOffres();
+    this.etudiantId = this.authService.getEtudiantId();
   }
 
   loadOffres(): void {
@@ -183,5 +190,19 @@ export class ListeOffresComponent implements OnInit {
         this.secteurs = [];
       }
     });
+  }
+
+  ouvrirPopup(id: number) {
+    this.offreSelectionnee = id;
+    this.popupVisible = true;
+  }
+
+  fermerPopup() {
+    this.popupVisible = false;
+    this.offreSelectionnee = null;
+  }
+
+  onCandidatureSubmitted() {
+    // Optionnel : rafraîchir la liste ou afficher un message
   }
 } 

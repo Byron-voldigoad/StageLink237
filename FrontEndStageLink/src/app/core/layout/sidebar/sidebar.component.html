@@ -15,7 +15,7 @@
     </div>
     <nav class="mt-4">
       <ul class="sidebar-menu space-y-2">
-        <li *ngFor="let item of menuItems">
+        <li *ngFor="let item of filteredMenuItems">
           <a
             [routerLink]="item.link"
             class="flex items-center px-3 py-2 text-sm font-medium text-white rounded-md transition-colors duration-150 hover:bg-white/20 hover:text-red-700 dark:hover:bg-black/30 dark:hover:text-white"

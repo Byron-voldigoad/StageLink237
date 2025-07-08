@@ -40,6 +40,10 @@ export class CandidatureService {
     return this.http.put<Candidature>(`${this.apiUrl}/${id}`, data);
   }
 
+  updateCandidatureWithFiles(id: number, formData: FormData): Observable<Candidature> {
+    return this.http.put<Candidature>(`${this.apiUrl}/${id}`, formData);
+  }
+
   deleteCandidature(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }

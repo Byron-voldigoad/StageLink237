@@ -128,4 +128,5 @@ Route::middleware('auth:sanctum')->prefix('ai')->group(function () {
     Route::post('/sujet-suggestions', [App\Http\Controllers\AIController::class, 'generateSujetSuggestions']);
     Route::get('/intelligent-search', [App\Http\Controllers\AIController::class, 'intelligentSearch']);
     Route::post('/generate-motivation', [App\Http\Controllers\AIController::class, 'generateMotivation']);
+    Route::post('/analyze-cv', [App\Http\Controllers\AIController::class, 'analyzeCV']);
 });

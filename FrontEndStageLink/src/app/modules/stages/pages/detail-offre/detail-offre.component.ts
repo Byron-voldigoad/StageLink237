@@ -9,7 +9,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { PostulerOffreComponent } from '../../components/postuler-offre/postuler-offre.component';
 import { CandidatureService, Candidature } from '../../services/candidature.service';
 import { AIAssistantComponent } from '../../../../shared/components/ai-assistant/ai-assistant.component';
-import { GeminiService, OffreStageAnalysis } from '../../../../core/services/gemini.service';
+import { GeminiService, OffreStageAnalysis, CVAnalysis } from '../../../../core/services/gemini.service';
 
 @Component({
   selector: 'app-detail-offre',
@@ -34,6 +34,15 @@ export class DetailOffreComponent implements OnInit {
   candidatsError: string | null = null;
   activeTab: 'detail' | 'candidats' = 'detail';
   viewMode: 'table' | 'cards' = 'table';
+  isAdmin: boolean = false;
+  isEntrepriseProprietaire: boolean = false;
+  isEtudiant: boolean = false;
+  user: any = null;
+
+  // Nouvelles propriétés pour l'analyse IA
+  analyzingCVs = false;
+  candidatsAnalyzed: any[] = [];
+  showAnalysis = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,6 +57,17 @@ export class DetailOffreComponent implements OnInit {
   ngOnInit(): void {
     // Récupérer l'ID de l'étudiant connecté
     this.currentEtudiantId = this.authService.getEtudiantId();
+    this.user = this.authService.getUser();
+    this.isAdmin = this.user && Array.isArray(this.user.roles)
+      ? this.user.roles.some((r: any) => r.nom_role === 'admin')
+      : (this.user && this.user.role === 'admin');
+    this.isEntrepriseProprietaire = this.user && ((Array.isArray(this.user.roles)
+      ? this.user.roles.some((r: any) => r.nom_role === 'entreprise')
+      : this.user.role === 'entreprise')
+      && this.offre && this.user.entreprise_id === this.offre.id_entreprise);
+    this.isEtudiant = this.user && (Array.isArray(this.user.roles)
+      ? this.user.roles.some((r: any) => r.nom_role === 'etudiant')
+      : this.user.role === 'etudiant');
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadOffre(parseInt(id));
@@ -61,6 +81,11 @@ export class DetailOffreComponent implements OnInit {
     this.offreStageService.getOffreById(id).subscribe({
       next: (offre) => {
         this.offre = offre;
+        // Mettre à jour isEntrepriseProprietaire après chargement de l'offre
+        this.isEntrepriseProprietaire = this.user && ((Array.isArray(this.user.roles)
+          ? this.user.roles.some((r: any) => r.nom_role === 'entreprise')
+          : this.user.role === 'entreprise')
+          && this.offre && this.user.entreprise_id === this.offre.id_entreprise);
         this.loading = false;
         if (offre.entreprise?.adresse) {
           this.loadCoordinates(offre.entreprise.adresse);
@@ -74,10 +99,7 @@ export class DetailOffreComponent implements OnInit {
             } else if (candidatures && Array.isArray(candidatures.data)) {
               list = candidatures.data;
             }
-            console.log('Liste des candidatures:', list);
-            console.log('ID de l\'offre:', offre.id_offre_stage);
             this.candidatureExistante = list.find((c: any) => c.id_offre_stage == offre.id_offre_stage) || null;
-            console.log('Candidature existante trouvée:', this.candidatureExistante);
           });
         }
       },
@@ -202,5 +224,75 @@ export class DetailOffreComponent implements OnInit {
   // Ajout : méthode pour changer le mode d'affichage
   setViewMode(mode: 'table' | 'cards') {
     this.viewMode = mode;
+  }
+
+  /**
+   * Retourne l'URL d'un fichier
+   */
+  getFileUrl(filePath: string): string {
+    return `http://localhost:8000/storage/${filePath}`;
+  }
+
+  /**
+   * Analyse tous les CV et classe les candidatures par pertinence
+   */
+  analyzeAndRankCandidatures(): void {
+    if (!this.offre || this.candidats.length === 0) return;
+
+    this.analyzingCVs = true;
+    this.showAnalysis = true;
+
+    this.geminiService.analyzeAndRankCandidatures(this.candidats, this.offre)
+      .subscribe({
+        next: (candidatsAnalyzed) => {
+          this.candidatsAnalyzed = candidatsAnalyzed;
+          this.analyzingCVs = false;
+          console.log('Candidatures analysées et classées:', candidatsAnalyzed);
+        },
+        error: (error) => {
+          console.error('Erreur lors de l\'analyse des CV:', error);
+          this.analyzingCVs = false;
+          // En cas d'erreur, on garde la liste originale
+          this.candidatsAnalyzed = this.candidats;
+        }
+      });
+  }
+
+  /**
+   * Retourne la couleur du score selon sa valeur
+   */
+  getScoreColor(score: number): string {
+    if (score >= 90) return 'text-green-600 bg-green-100';
+    if (score >= 70) return 'text-blue-600 bg-blue-100';
+    if (score >= 50) return 'text-yellow-600 bg-yellow-100';
+    if (score >= 30) return 'text-orange-600 bg-orange-100';
+    return 'text-red-600 bg-red-100';
+  }
+
+  /**
+   * Retourne le niveau d'adéquation en français
+   */
+  getNiveauLabel(niveau: string): string {
+    const labels: { [key: string]: string } = {
+      'excellent': 'Excellent',
+      'bon': 'Bon',
+      'moyen': 'Moyen',
+      'faible': 'Faible'
+    };
+    return labels[niveau] || niveau;
+  }
+
+  /**
+   * Bascule entre la vue normale et la vue analysée
+   */
+  toggleAnalysisView(): void {
+    if (this.showAnalysis && this.candidatsAnalyzed.length > 0) {
+      // On utilise déjà la vue analysée
+      return;
+    }
+    
+    if (!this.analyzingCVs) {
+      this.analyzeAndRankCandidatures();
+    }
   }
 } 

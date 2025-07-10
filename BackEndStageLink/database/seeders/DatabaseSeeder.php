@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             ProfilsSeeder::class,
             TutoratSeeder::class,
             SecteursSeeder::class,
+            RolesAndAdminSeeder::class, // Ajout du seeder pour rôles et comptes admin/entreprise
         ]);
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0');

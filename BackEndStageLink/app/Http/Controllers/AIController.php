@@ -10,11 +10,12 @@ use App\Models\OffreStage;
 use App\Models\Candidature;
 use App\Models\Tutorat;
 use App\Models\SujetExamen;
+use Smalot\PdfParser\Parser;
 
 class AIController extends Controller
 {
     private $geminiApiKey;
-    private $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    private $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
 
     public function __construct()
     {
@@ -187,41 +188,140 @@ class AIController extends Controller
     }
 
     /**
-     * Génère une lettre de motivation personnalisée pour un étudiant à partir d'une offre
+     * Génère une lettre de motivation IA pour une offre donnée
      */
-    public function generateMotivation(Request $request): JsonResponse
+    public function generateMotivation(Request $request)
+    {
+        $request->validate([
+            'offre_id' => 'required|integer|exists:offres_stage,id_offre_stage'
+        ]);
+
+        $offre = OffreStage::with('entreprise')->find($request->offre_id);
+        
+        if (!$offre) {
+            return response()->json(['error' => 'Offre non trouvée'], 404);
+        }
+
+        $prompt = "Génère une lettre de motivation professionnelle pour le poste suivant :\n\n";
+        $prompt .= "Titre du poste : {$offre->titre}\n";
+        $prompt .= "Entreprise : {$offre->entreprise->nom}\n";
+        $prompt .= "Description : {$offre->description}\n";
+        if ($offre->exigences) {
+            $prompt .= "Exigences : {$offre->exigences}\n";
+        }
+        if ($offre->competences_requises) {
+            $prompt .= "Compétences requises : {$offre->competences_requises}\n";
+        }
+        
+        $prompt .= "\nLa lettre doit être :\n";
+        $prompt .= "- Professionnelle et convaincante\n";
+        $prompt .= "- Adaptée au poste et à l'entreprise\n";
+        $prompt .= "- En français\n";
+        $prompt .= "- D'environ 300-400 mots\n";
+        $prompt .= "- Structurée avec une introduction, un développement et une conclusion\n";
+
+        $response = $this->callGeminiAPI($prompt);
+        
+        return response()->json([
+            'motivation' => $response
+        ]);
+    }
+
+    /**
+     * Analyse un CV pour évaluer sa pertinence par rapport à une offre
+     */
+    public function analyzeCV(Request $request)
+    {
+        $request->validate([
+            'cv_path' => 'required|string',
+            'offre_id' => 'required|integer|exists:offres_stage,id_offre_stage',
+            'titre_offre' => 'required|string',
+            'description_offre' => 'required|string',
+            'competences_requises' => 'nullable|string',
+            'exigences' => 'nullable|string'
+        ]);
+
+        // Extraire le texte du PDF
+        $cvContent = $this->extractTextFromPDF($request->cv_path);
+
+        $prompt = "Analyse ce CV par rapport à l'offre de stage suivante et attribue un score de pertinence de 0 à 100.\n\n";
+        $prompt .= "OFFRE DE STAGE :\n";
+        $prompt .= "Titre : {$request->titre_offre}\n";
+        $prompt .= "Description : {$request->description_offre}\n";
+        if ($request->competences_requises) {
+            $prompt .= "Compétences requises : {$request->competences_requises}\n";
+        }
+        if ($request->exigences) {
+            $prompt .= "Exigences : {$request->exigences}\n";
+        }
+        
+        $prompt .= "\nCV DU CANDIDAT (texte extrait) :\n";
+        $prompt .= $cvContent;
+        
+        $prompt .= "\n\nAnalyse ce CV et réponds en JSON avec la structure suivante :\n";
+        $prompt .= "{\n";
+        $prompt .= "  \"score_pertinence\": 85,\n";
+        $prompt .= "  \"competences_detectees\": [\"JavaScript\", \"React\", \"Node.js\"],\n";
+        $prompt .= "  \"experience_pertinente\": [\"Stage de 6 mois en développement web\"],\n";
+        $prompt .= "  \"points_forts\": [\"Bonne maîtrise des technologies requises\", \"Expérience pertinente\"],\n";
+        $prompt .= "  \"points_faibles\": [\"Manque d'expérience en équipe\"],\n";
+        $prompt .= "  \"recommandations\": [\"Mettre en avant les projets personnels\"],\n";
+        $prompt .= "  \"niveau_adequation\": \"bon\",\n";
+        $prompt .= "  \"temps_formation_estime\": \"2-3 semaines\"\n";
+        $prompt .= "}\n\n";
+        $prompt .= "Critères d'évaluation :\n";
+        $prompt .= "- Score 90-100 : Excellent match, candidat idéal\n";
+        $prompt .= "- Score 70-89 : Bon match, candidat prometteur\n";
+        $prompt .= "- Score 50-69 : Match moyen, formation nécessaire\n";
+        $prompt .= "- Score 30-49 : Match faible, formation importante requise\n";
+        $prompt .= "- Score 0-29 : Match très faible, non recommandé\n";
+
+        $response = $this->callGeminiAPI($prompt);
+        
+        // Essayer de parser la réponse JSON
+        $analysis = json_decode($response, true);
+        if (!$analysis) {
+            // Si le parsing échoue, créer une réponse par défaut
+            $analysis = [
+                'score_pertinence' => 50,
+                'competences_detectees' => [],
+                'experience_pertinente' => [],
+                'points_forts' => ['Analyse automatique en cours'],
+                'points_faibles' => [],
+                'recommandations' => ['Vérifier manuellement le CV'],
+                'niveau_adequation' => 'moyen',
+                'temps_formation_estime' => 'À évaluer'
+            ];
+        }
+        
+        return response()->json($analysis);
+    }
+
+    /**
+     * Extrait le texte d'un fichier PDF
+     */
+    private function extractTextFromPDF($filePath): string
     {
         try {
-            $request->validate([
-                'offre_id' => 'required|integer|exists:offres_stage,id_offre_stage',
-            ]);
-
-            $offre = OffreStage::find($request->offre_id);
-            if (!$offre) {
-                return response()->json(['error' => 'Offre non trouvée'], 404);
+            $fullPath = storage_path('app/public/' . $filePath);
+            
+            if (!file_exists($fullPath)) {
+                Log::warning("Fichier PDF non trouvé: {$fullPath}");
+                return "Fichier PDF non accessible: {$filePath}";
             }
 
-            $prompt = "Rédige une lettre de motivation simple et concise (10-12 lignes maximum) pour un étudiant qui postule à ce stage :\n";
-            $prompt .= "- N’inclus pas de champs à remplir (nom, adresse, etc.)\n";
-            $prompt .= "- Utilise un ton direct, professionnel mais accessible\n";
-            $prompt .= "- Mets en avant la motivation d’apprendre et de contribuer\n";
-            $prompt .= "- Ne mentionne pas de portfolio ou d’expérience précise\n";
-            $prompt .= "Offre de stage :\n";
-            $prompt .= "Titre : {$offre->titre}\n";
-            $prompt .= "Description : {$offre->description}\n";
-            if ($offre->exigences) $prompt .= "Exigences : {$offre->exigences}\n";
-            if ($offre->competences_requises) $prompt .= "Compétences requises : {$offre->competences_requises}\n";
-
-            $result = $this->callGeminiAPI($prompt);
-            $motivation = is_array($result) && isset($result['text']) ? $result['text'] : (is_string($result) ? $result : '');
-
-            return response()->json([
-                'success' => true,
-                'motivation' => $motivation,
-            ]);
+            $parser = new Parser();
+            $pdf = $parser->parseFile($fullPath);
+            $text = $pdf->getText();
+            
+            // Nettoyer le texte
+            $text = preg_replace('/\s+/', ' ', $text); // Remplacer les espaces multiples
+            $text = trim($text);
+            
+            return $text ?: "Impossible d'extraire le texte du PDF";
         } catch (\Exception $e) {
-            Log::error('Erreur génération motivation IA: ' . $e->getMessage());
-            return response()->json(['error' => 'Erreur lors de la génération'], 500);
+            Log::error("Erreur extraction PDF: " . $e->getMessage());
+            return "Erreur lors de l'extraction du texte du PDF: " . $e->getMessage();
         }
     }
 

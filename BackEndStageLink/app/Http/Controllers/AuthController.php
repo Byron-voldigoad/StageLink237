@@ -31,7 +31,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('roles'),
             'token' => $token,
             'etudiant_id' => $etudiantId
         ]);

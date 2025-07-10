@@ -17,14 +17,29 @@
       </div>
     </div>
 
-    <!-- Offre Content -->
+    <!-- Onglets Détail / Candidats -->
+    <div class="flex space-x-4 mb-6 mt-8">
+      <button (click)="setActiveTab('detail')"
+        [ngClass]="{'border-b-2 border-red-500 text-red-600': activeTab === 'detail', 'text-gray-500': activeTab !== 'detail'}"
+        class="py-2 px-4 font-semibold focus:outline-none">
+        Détail
+      </button>
+      <button *ngIf="isAdmin || isEntrepriseProprietaire" (click)="setActiveTab('candidats')"
+        [ngClass]="{'border-b-2 border-red-500 text-red-600': activeTab === 'candidats', 'text-gray-500': activeTab !== 'candidats'}"
+        class="py-2 px-4 font-semibold focus:outline-none">
+        Candidats
+      </button>
+    </div>
+
+    <!-- Contenu Onglet Détail -->
+    <div *ngIf="activeTab === 'detail'">
     <div *ngIf="offre" class="space-y-6">
-      <!-- Assistant IA -->
-      <app-ai-assistant 
-        type="offre-analysis"
-        [data]="offre"
-        (resultReady)="onAIAnalysisResult($event)">
-      </app-ai-assistant>
+        <!-- Assistant IA -->
+        <app-ai-assistant 
+          type="offre-analysis"
+          [data]="offre"
+          (resultReady)="onAIAnalysisResult($event)">
+        </app-ai-assistant>
       <!-- Header Section -->
       <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="p-6 sm:p-8">
@@ -221,7 +236,7 @@
               </div>
             </ng-container>
             <ng-template #postulerBtn>
-            <button 
+                <button *ngIf="isEtudiant"
               (click)="onPostuler()"
               class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,7 +260,6 @@
           </svg>
           Retour à la liste
         </button>
-      </div>
     </div>
   </div>
 
@@ -305,112 +319,159 @@
     (candidatureSubmitted)="onCandidatureSubmitted($event)"
     (closeModal)="closePostulerModal()">
   </app-postuler-offre>
+    </div>
 
-  <!-- Onglets Détail / Candidats -->
-  <div class="flex space-x-4 mb-6 mt-8">
-    <button (click)="setActiveTab('detail')"
-      [ngClass]="{'border-b-2 border-red-500 text-red-600': activeTab === 'detail', 'text-gray-500': activeTab !== 'detail'}"
-      class="py-2 px-4 font-semibold focus:outline-none">
-      Détail
-    </button>
-    <button (click)="setActiveTab('candidats')"
-      [ngClass]="{'border-b-2 border-red-500 text-red-600': activeTab === 'candidats', 'text-gray-500': activeTab !== 'candidats'}"
-      class="py-2 px-4 font-semibold focus:outline-none">
-      Candidats
-    </button>
-  </div>
-
-  <!-- Contenu Onglet Détail -->
-  <div *ngIf="activeTab === 'detail'">
-    <!-- ... tout le contenu existant de la page ... -->
-  </div>
-
-  <!-- Contenu Onglet Candidats -->
-  <div *ngIf="activeTab === 'candidats'">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-semibold text-gray-900">Liste des candidats</h2>
-      <div class="flex space-x-2">
-        <button (click)="setViewMode('table')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'table', 'bg-gray-100 text-gray-700': viewMode !== 'table'}" class="px-3 py-1 rounded-l-md font-medium">Tableau</button>
-        <button (click)="setViewMode('cards')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'cards', 'bg-gray-100 text-gray-700': viewMode !== 'cards'}" class="px-3 py-1 rounded-r-md font-medium">Cartes</button>
+    <!-- Contenu Onglet Candidats -->
+    <div *ngIf="activeTab === 'candidats' && (isAdmin || isEntrepriseProprietaire)">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-900">Liste des candidats</h2>
+        <div class="flex space-x-2">
+          <button (click)="setViewMode('table')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'table', 'bg-gray-100 text-gray-700': viewMode !== 'table'}" class="px-3 py-1 rounded-l-md font-medium">Tableau</button>
+          <button (click)="setViewMode('cards')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'cards', 'bg-gray-100 text-gray-700': viewMode !== 'cards'}" class="px-3 py-1 rounded-r-md font-medium">Cartes</button>
+          <button (click)="toggleAnalysisView()" 
+                  [disabled]="analyzingCVs"
+                  class="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
+            <span *ngIf="analyzingCVs" class="inline-flex items-center">
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Analyse en cours...
+            </span>
+            <span *ngIf="!analyzingCVs">
+              <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+              Analyser les CV
+            </span>
+          </button>
+        </div>
       </div>
-    </div>
-    <div *ngIf="candidatsLoading" class="text-center py-8 text-gray-500">Chargement...</div>
-    <div *ngIf="candidatsError" class="text-red-600 py-4">{{ candidatsError }}</div>
-    <div *ngIf="!candidatsLoading && !candidatsError && candidats.length === 0" class="text-gray-500 py-8 text-center">Aucun candidat pour cette offre.</div>
+      <div *ngIf="candidatsLoading" class="text-center py-8 text-gray-500">Chargement...</div>
+      <div *ngIf="candidatsError" class="text-red-600 py-4">{{ candidatsError }}</div>
+      <div *ngIf="!candidatsLoading && !candidatsError && candidats.length === 0" class="text-gray-500 py-8 text-center">Aucun candidat pour cette offre.</div>
 
-    <!-- Affichage Tableau -->
-    <div *ngIf="viewMode === 'table' && candidats.length > 0" class="overflow-x-auto">
-      <table class="min-w-full bg-white rounded-lg shadow-sm">
-        <thead>
-          <tr class="bg-gray-100">
-            <th class="px-4 py-2 text-left">Nom</th>
-            <th class="px-4 py-2 text-left">Prénom</th>
-            <th class="px-4 py-2 text-left">Email</th>
-            <th class="px-4 py-2 text-left">Niveau</th>
-            <th class="px-4 py-2 text-left">Spécialité</th>
-            <th class="px-4 py-2 text-left">Date</th>
-            <th class="px-4 py-2 text-left">Statut</th>
-            <th class="px-4 py-2 text-left">CV</th>
-            <th class="px-4 py-2 text-left">Lettre</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let c of candidats" class="border-b">
-            <td class="px-4 py-2">{{ c.etudiant?.utilisateur?.nom }}</td>
-            <td class="px-4 py-2">{{ c.etudiant?.utilisateur?.prenom }}</td>
-            <td class="px-4 py-2">{{ c.etudiant?.utilisateur?.email }}</td>
-            <td class="px-4 py-2">{{ c.etudiant?.niveau_etude }}</td>
-            <td class="px-4 py-2">{{ c.etudiant?.specialite }}</td>
-            <td class="px-4 py-2">{{ c.created_at | date:'shortDate' }}</td>
-            <td class="px-4 py-2">
-              <span [ngClass]="{
-                'bg-yellow-100 text-yellow-800': c.statut === 'en_attente',
-                'bg-green-100 text-green-800': c.statut === 'acceptee',
-                'bg-red-100 text-red-800': c.statut === 'refusee',
-                'bg-gray-100 text-gray-800': c.statut === 'annulee'
-              }" class="inline-block px-2 py-1 rounded-full text-xs font-semibold">
-                {{ c.statut }}
+      <!-- Affichage Tableau -->
+      <div *ngIf="viewMode === 'table' && candidats.length > 0" class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-lg shadow-sm">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 text-left">Nom</th>
+              <th class="px-4 py-2 text-left">Prénom</th>
+              <th class="px-4 py-2 text-left">Email</th>
+              <th class="px-4 py-2 text-left">Niveau</th>
+              <th class="px-4 py-2 text-left">Spécialité</th>
+              <th class="px-4 py-2 text-left">Date</th>
+              <th class="px-4 py-2 text-left">Statut</th>
+              <th *ngIf="showAnalysis && candidatsAnalyzed.length > 0" class="px-4 py-2 text-left">Score IA</th>
+              <th class="px-4 py-2 text-left">CV</th>
+              <th class="px-4 py-2 text-left">Lettre</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of (showAnalysis && candidatsAnalyzed.length > 0 ? candidatsAnalyzed : candidats)" class="border-b">
+              <td class="px-4 py-2">{{ c.etudiant?.utilisateur?.nom }}</td>
+              <td class="px-4 py-2">{{ c.etudiant?.utilisateur?.prenom }}</td>
+              <td class="px-4 py-2">{{ c.etudiant?.utilisateur?.email }}</td>
+              <td class="px-4 py-2">{{ c.etudiant?.niveau_etude }}</td>
+              <td class="px-4 py-2">{{ c.etudiant?.specialite }}</td>
+              <td class="px-4 py-2">{{ c.created_at | date:'shortDate' }}</td>
+              <td class="px-4 py-2">
+                <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': c.statut === 'en_attente',
+                  'bg-green-100 text-green-800': c.statut === 'acceptee',
+                  'bg-red-100 text-red-800': c.statut === 'refusee',
+                  'bg-gray-100 text-gray-800': c.statut === 'annulee'
+                }" class="inline-block px-2 py-1 rounded-full text-xs font-semibold">
+                  {{ c.statut }}
+                </span>
+              </td>
+              <td *ngIf="showAnalysis && candidatsAnalyzed.length > 0" class="px-4 py-2">
+                <span *ngIf="c.analysis" 
+                      [ngClass]="getScoreColor(c.analysis.score_pertinence)"
+                      class="inline-block px-2 py-1 rounded-full text-xs font-semibold">
+                  {{ c.analysis.score_pertinence }}/100
+                </span>
+              </td>
+              <td class="px-4 py-2">
+                <a *ngIf="c.cv_path" [href]="getFileUrl(c.cv_path)" target="_blank" 
+                   class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  CV
+                </a>
+              </td>
+              <td class="px-4 py-2">
+                <a *ngIf="c.lettre_motivation_path" [href]="getFileUrl(c.lettre_motivation_path)" target="_blank" 
+                   class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  Lettre
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Affichage Cartes -->
+      <div *ngIf="viewMode === 'cards' && candidats.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let c of (showAnalysis && candidatsAnalyzed.length > 0 ? candidatsAnalyzed : candidats)" class="bg-white rounded-lg shadow p-6 flex flex-col space-y-2 border border-gray-100">
+          <div class="flex items-center space-x-3 mb-2">
+            <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-red-600">
+              {{ c.etudiant?.utilisateur?.prenom?.charAt(0) || '?' }}
+            </div>
+            <div>
+              <div class="font-semibold text-gray-900">{{ c.etudiant?.utilisateur?.prenom }} {{ c.etudiant?.utilisateur?.nom }}</div>
+              <div class="text-xs text-gray-500">{{ c.etudiant?.utilisateur?.email }}</div>
+            </div>
+          </div>
+          <div class="text-sm text-gray-700"><span class="font-medium">Niveau :</span> {{ c.etudiant?.niveau_etude }}</div>
+          <div class="text-sm text-gray-700"><span class="font-medium">Spécialité :</span> {{ c.etudiant?.specialite }}</div>
+          <div class="text-sm text-gray-700"><span class="font-medium">Date :</span> {{ c.created_at | date:'shortDate' }}</div>
+          <div class="text-sm">
+            <span [ngClass]="{
+              'bg-yellow-100 text-yellow-800': c.statut === 'en_attente',
+              'bg-green-100 text-green-800': c.statut === 'acceptee',
+              'bg-red-100 text-red-800': c.statut === 'refusee',
+              'bg-gray-100 text-gray-800': c.statut === 'annulee'
+            }" class="inline-block px-2 py-1 rounded-full text-xs font-semibold">
+              {{ c.statut }}
+            </span>
+          </div>
+          
+          <!-- Score IA -->
+          <div *ngIf="showAnalysis && c.analysis" class="mt-2">
+            <div class="text-sm">
+              <span class="font-medium">Score IA :</span>
+              <span [ngClass]="getScoreColor(c.analysis.score_pertinence)"
+                    class="ml-1 inline-block px-2 py-1 rounded-full text-xs font-semibold">
+                {{ c.analysis.score_pertinence }}/100
               </span>
-            </td>
-            <td class="px-4 py-2">
-              <a *ngIf="c.cv_path" [href]="'/storage/' + c.cv_path" target="_blank" class="text-blue-600 hover:underline">Voir</a>
-            </td>
-            <td class="px-4 py-2">
-              <a *ngIf="c.lettre_motivation_path" [href]="'/storage/' + c.lettre_motivation_path" target="_blank" class="text-blue-600 hover:underline">Voir</a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Affichage Cartes -->
-    <div *ngIf="viewMode === 'cards' && candidats.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let c of candidats" class="bg-white rounded-lg shadow p-6 flex flex-col space-y-2 border border-gray-100">
-        <div class="flex items-center space-x-3 mb-2">
-          <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-lg font-bold text-red-600">
-            {{ c.etudiant?.utilisateur?.prenom?.charAt(0) || '?' }}
+            </div>
+            <div class="text-xs text-gray-600 mt-1">
+              Niveau : {{ getNiveauLabel(c.analysis.niveau_adequation) }}
+            </div>
           </div>
-          <div>
-            <div class="font-semibold text-gray-900">{{ c.etudiant?.utilisateur?.prenom }} {{ c.etudiant?.utilisateur?.nom }}</div>
-            <div class="text-xs text-gray-500">{{ c.etudiant?.utilisateur?.email }}</div>
+          
+          <div class="flex space-x-2 mt-3">
+            <a *ngIf="c.cv_path" [href]="getFileUrl(c.cv_path)" target="_blank" 
+               class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              CV
+            </a>
+            <a *ngIf="c.lettre_motivation_path" [href]="getFileUrl(c.lettre_motivation_path)" target="_blank" 
+               class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Lettre
+            </a>
           </div>
-        </div>
-        <div class="text-sm text-gray-700"><span class="font-medium">Niveau :</span> {{ c.etudiant?.niveau_etude }}</div>
-        <div class="text-sm text-gray-700"><span class="font-medium">Spécialité :</span> {{ c.etudiant?.specialite }}</div>
-        <div class="text-sm text-gray-700"><span class="font-medium">Date :</span> {{ c.created_at | date:'shortDate' }}</div>
-        <div class="text-sm">
-          <span [ngClass]="{
-            'bg-yellow-100 text-yellow-800': c.statut === 'en_attente',
-            'bg-green-100 text-green-800': c.statut === 'acceptee',
-            'bg-red-100 text-red-800': c.statut === 'refusee',
-            'bg-gray-100 text-gray-800': c.statut === 'annulee'
-          }" class="inline-block px-2 py-1 rounded-full text-xs font-semibold">
-            {{ c.statut }}
-          </span>
-        </div>
-        <div class="flex space-x-2 mt-2">
-          <a *ngIf="c.cv_path" [href]="'/storage/' + c.cv_path" target="_blank" class="text-blue-600 hover:underline text-sm">CV</a>
-          <a *ngIf="c.lettre_motivation_path" [href]="'/storage/' + c.lettre_motivation_path" target="_blank" class="text-blue-600 hover:underline text-sm">Lettre</a>
         </div>
       </div>
     </div>

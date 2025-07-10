@@ -21,9 +21,17 @@ export class DetailTutoratComponent implements OnInit {
   error = '';
   success = '';
   isTuteur = false;
+  isAdmin = false;
+  isEtudiant = false;
   currentUserId: number = 0;
   showConfirmationPopup = false;
   user: any = null;
+  
+  // Onglets Détail/Candidats
+  activeTab: 'detail' | 'candidats' = 'detail';
+  setActiveTab(tab: 'detail' | 'candidats') {
+    this.activeTab = tab;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -36,9 +44,18 @@ export class DetailTutoratComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
+    console.log('USER DEBUG', this.user);
     if (this.user) {
       this.currentUserId = this.user.etudiant_id || 0;
-      this.isTuteur = this.user.role === 'tuteur';
+      this.isTuteur = Array.isArray(this.user.roles) && this.user.roles.some((r: any) => r.nom_role === 'tuteur');
+      this.isAdmin = Array.isArray(this.user.roles) && this.user.roles.some((r: any) => r.nom_role === 'admin');
+      this.isEtudiant = Array.isArray(this.user.roles)
+        ? this.user.roles.some((r: any) => r.nom_role === 'etudiant')
+        : this.user.role === 'etudiant';
+      console.log('isTuteur:', this.isTuteur, 'isAdmin:', this.isAdmin, 'isEtudiant:', this.isEtudiant, 'roles:', this.user.roles);
+      if (!(this.isTuteur || this.isAdmin)) {
+        this.activeTab = 'detail';
+      }
     }
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -51,7 +68,11 @@ export class DetailTutoratComponent implements OnInit {
     this.tutoratService.getById(id).subscribe({
       next: (tutorat: Tutorat) => {
         this.tutorat = tutorat;
-        this.isTuteur = tutorat.tuteur_id === this.currentUserId;
+        // Correction : seul le tuteur lié ET ayant le rôle tuteur, ou l'admin, peut voir l'onglet Candidats
+        this.isTuteur = Array.isArray(this.user.roles)
+          && this.user.roles.some((r: any) => r.nom_role === 'tuteur')
+          && tutorat.tuteur_id === this.currentUserId;
+        // isAdmin reste global
         this.loading = false;
       },
       error: (error) => {

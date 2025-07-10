@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
@@ -36,6 +36,17 @@ export interface CandidatureAnalysis {
   suggestions_cv: string[];
   score_global: number;
   recommandations: string[];
+}
+
+export interface CVAnalysis {
+  score_pertinence: number; // Score de 0 à 100
+  competences_detectees: string[];
+  experience_pertinente: string[];
+  points_forts: string[];
+  points_faibles: string[];
+  recommandations: string[];
+  niveau_adequation: 'excellent' | 'bon' | 'moyen' | 'faible';
+  temps_formation_estime: string;
 }
 
 export interface TutoratRecommendation {
@@ -127,6 +138,60 @@ export class GeminiService {
   }
 
   /**
+   * Analyse un CV pour évaluer sa pertinence par rapport à une offre
+   */
+  analyzeCV(cvPath: string, offre: any): Observable<CVAnalysis> {
+    const token = localStorage.getItem('token');
+    const headersConfig: any = {
+      'Content-Type': 'application/json'
+    };
+    if (token) {
+      headersConfig['Authorization'] = `Bearer ${token}`;
+    }
+    const headers = new HttpHeaders(headersConfig);
+    
+    const payload = {
+      cv_path: cvPath,
+      offre_id: offre.id_offre_stage,
+      titre_offre: offre.titre,
+      description_offre: offre.description,
+      competences_requises: offre.competences_requises,
+      exigences: offre.exigences
+    };
+
+    return this.http.post<any>(
+      '/api/ai/analyze-cv',
+      payload,
+      { headers }
+    ).pipe(
+      map(response => this.parseCVAnalysis(response)),
+      catchError(error => {
+        console.error('Erreur analyse CV:', error);
+        return of(this.getDefaultCVAnalysis());
+      })
+    );
+  }
+
+  /**
+   * Analyse tous les CV d'une offre et les classe par pertinence
+   */
+  analyzeAndRankCandidatures(candidatures: any[], offre: any): Observable<any[]> {
+    const analyses = candidatures.map(candidature => 
+      this.analyzeCV(candidature.cv_path || '', offre).pipe(
+        map(analysis => ({
+          ...candidature,
+          analysis: analysis,
+          score: analysis.score_pertinence
+        }))
+      )
+    );
+
+    return forkJoin(analyses).pipe(
+      map(results => results.sort((a, b) => b.score - a.score))
+    );
+  }
+
+  /**
    * Appel au backend Laravel qui fait le proxy Gemini
    */
   private callGeminiAPI(offreId: number): Observable<string> {
@@ -210,5 +275,26 @@ export class GeminiService {
 
   private extractText(response: string): string {
     return response.trim();
+  }
+
+  private parseCVAnalysis(response: string): CVAnalysis {
+    try {
+      return JSON.parse(response);
+    } catch {
+      return this.getDefaultCVAnalysis();
+    }
+  }
+
+  private getDefaultCVAnalysis(): CVAnalysis {
+    return {
+      score_pertinence: 50,
+      competences_detectees: [],
+      experience_pertinente: [],
+      points_forts: [],
+      points_faibles: [],
+      recommandations: [],
+      niveau_adequation: 'moyen',
+      temps_formation_estime: 'Inconnu'
+    };
   }
 } 

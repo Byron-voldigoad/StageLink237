@@ -32,7 +32,7 @@ export const environment = {
 #### Backend
 ```env
 # .env
-GEMINI_API_KEY=votre_cle_api_gemini_ici
+GEMINI_API_KEY=AIzaSyAJWDp9BYAe1QREiNhFJcRPDGnAcvZeYQY
 ```
 
 ### 2. Installation des dépendances
@@ -221,11 +221,11 @@ Log::error('Erreur analyse offre IA: ' . $e->getMessage());
 ### Variables d'environnement
 ```env
 # Production
-GEMINI_API_KEY=your_production_key
+GEMINI_API_KEY=AIzaSyAJWDp9BYAe1QREiNhFJcRPDGnAcvZeYQY
 APP_ENV=production
 
 # Développement
-GEMINI_API_KEY=your_development_key
+GEMINI_API_KEY=AIzaSyAJWDp9BYAe1QREiNhFJcRPDGnAcvZeYQY
 APP_ENV=local
 ```
 
@@ -265,7 +265,7 @@ php artisan route:cache
 #### Clé API invalide
 ```
 Erreur: Clé API Gemini non configurée
-Solution: Vérifier GEMINI_API_KEY dans .env
+Solution: Vérifier AIzaSyAJWDp9BYAe1QREiNhFJcRPDGnAcvZeYQY dans .env
 ```
 
 #### Timeout des requêtes

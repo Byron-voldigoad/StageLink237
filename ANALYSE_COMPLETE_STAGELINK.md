@@ -233,7 +233,7 @@ Route::middleware('auth:sanctum')->prefix('ai')->group(function () {
 ### Variables d'environnement requises
 ```env
 # Backend
-GEMINI_API_KEY=votre_cle_api_gemini
+GEMINI_API_KEY=AIzaSyAJWDp9BYAe1QREiNhFJcRPDGnAcvZeYQY
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306

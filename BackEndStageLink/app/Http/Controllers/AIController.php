@@ -6,20 +6,33 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Google\Auth\CredentialsLoader;
 use App\Models\OffreStage;
 use App\Models\Candidature;
 use App\Models\Tutorat;
 use App\Models\SujetExamen;
 use Smalot\PdfParser\Parser;
+use Google\Cloud\AIPlatform\V1\PredictionServiceClient;
+use Google\Cloud\AIPlatform\V1\Content;
+use Google\Cloud\AIPlatform\V1\GenerateContentRequest;
 
 class AIController extends Controller
 {
-    private $geminiApiKey;
-    private $geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+    private $credentialsLoader;
+    private $geminiApiUrl;
+    private $apiKey;
 
     public function __construct()
     {
-        $this->geminiApiKey = env('GEMINI_API_KEY');
+        $this->apiKey = config('services.gemini.key');
+        $this->geminiApiUrl = config('services.gemini.url');
+        
+        if (empty($this->apiKey)) {
+            throw new \RuntimeException('La clé API Gemini n\'est pas configurée');
+        }
+        if (empty($this->geminiApiUrl)) {
+            throw new \RuntimeException('L\'URL de l\'API Gemini n\'est pas configurée');
+        }
     }
 
     /**
@@ -210,7 +223,11 @@ class AIController extends Controller
             $prompt .= "Exigences : {$offre->exigences}\n";
         }
         if ($offre->competences_requises) {
-            $prompt .= "Compétences requises : {$offre->competences_requises}\n";
+            $competencesRequises = $offre->competences_requises;
+            if (is_array($competencesRequises)) {
+                $competencesRequises = implode(', ', $competencesRequises);
+            }
+            $prompt .= "Compétences requises : {$competencesRequises}\n";
         }
         
         $prompt .= "\nLa lettre doit être :\n";
@@ -232,132 +249,181 @@ class AIController extends Controller
      */
     public function analyzeCV(Request $request)
     {
-        $request->validate([
-            'cv_path' => 'required|string',
-            'offre_id' => 'required|integer|exists:offres_stage,id_offre_stage',
-            'titre_offre' => 'required|string',
-            'description_offre' => 'required|string',
-            'competences_requises' => 'nullable|string',
-            'exigences' => 'nullable|string'
-        ]);
+        try {
+             Log::info('Request Headers:', $request->headers->all());
+        Log::info('Request Data:', $request->all());
+        
+            $request->validate([
+                'cv_path' => 'required|string|regex:/^candidatures\/cv\/[a-zA-Z0-9_\-\.]+\.pdf$/',
+                'offre_id' => 'required|exists:offres_stage,id_offre_stage'
+            ]);
 
-        // Extraire le texte du PDF
-        $cvContent = $this->extractTextFromPDF($request->cv_path);
+            $fullPath = storage_path('app/public/' . $request->cv_path);
+            if (!file_exists($fullPath)) {
+                throw new \Exception("Fichier CV introuvable: " . $fullPath);
+            }
 
-        $prompt = "Analyse ce CV par rapport à l'offre de stage suivante et attribue un score de pertinence de 0 à 100.\n\n";
-        $prompt .= "OFFRE DE STAGE :\n";
-        $prompt .= "Titre : {$request->titre_offre}\n";
-        $prompt .= "Description : {$request->description_offre}\n";
-        if ($request->competences_requises) {
-            $prompt .= "Compétences requises : {$request->competences_requises}\n";
-        }
-        if ($request->exigences) {
-            $prompt .= "Exigences : {$request->exigences}\n";
-        }
-        
-        $prompt .= "\nCV DU CANDIDAT (texte extrait) :\n";
-        $prompt .= $cvContent;
-        
-        $prompt .= "\n\nAnalyse ce CV et réponds en JSON avec la structure suivante :\n";
-        $prompt .= "{\n";
-        $prompt .= "  \"score_pertinence\": 85,\n";
-        $prompt .= "  \"competences_detectees\": [\"JavaScript\", \"React\", \"Node.js\"],\n";
-        $prompt .= "  \"experience_pertinente\": [\"Stage de 6 mois en développement web\"],\n";
-        $prompt .= "  \"points_forts\": [\"Bonne maîtrise des technologies requises\", \"Expérience pertinente\"],\n";
-        $prompt .= "  \"points_faibles\": [\"Manque d'expérience en équipe\"],\n";
-        $prompt .= "  \"recommandations\": [\"Mettre en avant les projets personnels\"],\n";
-        $prompt .= "  \"niveau_adequation\": \"bon\",\n";
-        $prompt .= "  \"temps_formation_estime\": \"2-3 semaines\"\n";
-        $prompt .= "}\n\n";
-        $prompt .= "Critères d'évaluation :\n";
-        $prompt .= "- Score 90-100 : Excellent match, candidat idéal\n";
-        $prompt .= "- Score 70-89 : Bon match, candidat prometteur\n";
-        $prompt .= "- Score 50-69 : Match moyen, formation nécessaire\n";
-        $prompt .= "- Score 30-49 : Match faible, formation importante requise\n";
-        $prompt .= "- Score 0-29 : Match très faible, non recommandé\n";
+            $offre = OffreStage::findOrFail($request->offre_id);
+            
+            // Débogage pour identifier les champs problématiques
+            Log::info('Débogage offre:', [
+                'titre' => is_string($offre->titre) ? 'string' : gettype($offre->titre),
+                'description' => is_string($offre->description) ? 'string' : gettype($offre->description),
+                'competences_requises' => is_string($offre->competences_requises) ? 'string' : gettype($offre->competences_requises),
+                'exigences' => is_string($offre->exigences) ? 'string' : gettype($offre->exigences),
+            ]);
+            
+            $cvContent = $this->extractTextFromPDF($request->cv_path);
 
-        $response = $this->callGeminiAPI($prompt);
-        
-        // Essayer de parser la réponse JSON
-        $analysis = json_decode($response, true);
-        if (!$analysis) {
-            // Si le parsing échoue, créer une réponse par défaut
-            $analysis = [
-                'score_pertinence' => 50,
-                'competences_detectees' => [],
-                'experience_pertinente' => [],
-                'points_forts' => ['Analyse automatique en cours'],
-                'points_faibles' => [],
-                'recommandations' => ['Vérifier manuellement le CV'],
-                'niveau_adequation' => 'moyen',
-                'temps_formation_estime' => 'À évaluer'
-            ];
+            $prompt = $this->buildCVAnalysisPrompt($offre, $cvContent);
+            $geminiResponse = $this->callGeminiAPI($prompt);
+
+            // Formatage strict de la réponse
+            $analysis = $this->formatGeminiResponse($geminiResponse);
+            
+            if (!isset($analysis['score_pertinence'])) {
+                throw new \Exception("Réponse de l'IA incomplète");
+            }
+
+            return response()->json([
+                'success' => true,
+                'analysis' => $analysis
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Erreur analyse CV: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'trace' => env('APP_DEBUG') ? $e->getTraceAsString() : null
+            ], 500);
         }
-        
-        return response()->json($analysis);
     }
+
+    /**
+     * Analyse un CV pour évaluer sa pertinence par rapport à une offre
+     */
+
+private function buildCVAnalysisPrompt($offre, $cvContent): string
+{
+    // Débogage pour identifier les champs problématiques
+    Log::info('Débogage buildCVAnalysisPrompt:', [
+        'titre_type' => gettype($offre->titre),
+        'description_type' => gettype($offre->description),
+        'competences_requises_type' => gettype($offre->competences_requises),
+        'cvContent_type' => gettype($cvContent),
+    ]);
+    
+    // S'assurer que competences_requises est une chaîne
+    $competencesRequises = $offre->competences_requises;
+    if (is_array($competencesRequises)) {
+        $competencesRequises = implode(', ', $competencesRequises);
+    } elseif (empty($competencesRequises)) {
+        $competencesRequises = 'Non spécifiées';
+    }
+
+    // S'assurer que tous les champs sont des chaînes
+    $titre = is_string($offre->titre) ? $offre->titre : (string)$offre->titre;
+    $description = is_string($offre->description) ? $offre->description : (string)$offre->description;
+    $cvContentStr = is_string($cvContent) ? $cvContent : (string)$cvContent;
+
+    return "Analyse ce CV par rapport à cette offre:\n\n"
+        . "Titre Offre: {$titre}\n"
+        . "Description: {$description}\n"
+        . "Compétences Requises: {$competencesRequises}\n\n"
+        . "Contenu du CV:\n{$cvContentStr}\n\n"
+        . "Retourne UNIQUEMENT un JSON valide avec ces champs: "
+        . "score_pertinence (0-100), competences, points_forts, points_faibles, recommandations";
+}
+
+private function formatGeminiResponse(string $jsonResponse)
+{
+    $decoded = json_decode($jsonResponse, true);
+    
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new \Exception("Réponse JSON invalide de l'API");
+    }
+    
+    // Nettoyage supplémentaire si nécessaire
+    if (is_string($decoded)) {
+        $cleaned = str_replace(['```json', '```'], '', $decoded);
+        $decoded = json_decode($cleaned, true);
+    }
+    
+    return $decoded;
+}
 
     /**
      * Extrait le texte d'un fichier PDF
      */
     private function extractTextFromPDF($filePath): string
-    {
-        try {
-            $fullPath = storage_path('app/public/' . $filePath);
-            
-            if (!file_exists($fullPath)) {
-                Log::warning("Fichier PDF non trouvé: {$fullPath}");
-                return "Fichier PDF non accessible: {$filePath}";
-            }
-
-            $parser = new Parser();
-            $pdf = $parser->parseFile($fullPath);
-            $text = $pdf->getText();
-            
-            // Nettoyer le texte
-            $text = preg_replace('/\s+/', ' ', $text); // Remplacer les espaces multiples
-            $text = trim($text);
-            
-            return $text ?: "Impossible d'extraire le texte du PDF";
-        } catch (\Exception $e) {
-            Log::error("Erreur extraction PDF: " . $e->getMessage());
-            return "Erreur lors de l'extraction du texte du PDF: " . $e->getMessage();
+{
+    try {
+        $fullPath = storage_path('app/public/' . $filePath);
+        Log::info("Chemin complet du PDF: " . $fullPath);
+        
+        if (!file_exists($fullPath)) {
+            throw new \Exception("Fichier PDF non trouvé: {$fullPath}");
         }
+
+        $parser = new Parser();
+        $pdf = $parser->parseFile($fullPath);
+        $text = $pdf->getText();
+        
+        return $text ?: "Impossible d'extraire le texte du PDF";
+    } catch (\Exception $e) {
+        Log::error("Erreur extraction PDF: " . $e->getMessage());
+        throw $e;
     }
+}
 
     /**
      * Appel à l'API Gemini
      */
-    private function callGeminiAPI(string $prompt): array
-    {
-        if (empty($this->geminiApiKey)) {
-            throw new \Exception('Clé API Gemini non configurée');
-        }
-
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json'
-        ])->post($this->geminiApiUrl . '?key=' . $this->geminiApiKey, [
-            'contents' => [
-                [
+   private function callGeminiAPI(string $prompt)
+{
+    try {
+        $response = Http::timeout(30)->post(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=".env('GEMINI_API_KEY'), 
+            [
+                'contents' => [
                     'parts' => [
                         ['text' => $prompt]
                     ]
+                ],
+                'generationConfig' => [
+                    'response_mime_type' => 'application/json'
                 ]
             ]
-        ]);
+        );
 
         if (!$response->successful()) {
-            throw new \Exception('Erreur API Gemini: ' . $response->body());
+            throw new \Exception('Erreur API: '.$response->body());
         }
 
-        $data = $response->json();
-        $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+        $responseData = $response->json();
+        
+        // Retourne TOUJOURS une string JSON
+        return $responseData['candidates'][0]['content']['parts'][0]['text'];
 
-        // Essayer de parser le JSON de la réponse
-        try {
-            return json_decode($text, true) ?: ['text' => $text];
-        } catch (\Exception $e) {
-            return ['text' => $text];
+    } catch (\Exception $e) {
+        // Retourne aussi une string JSON en cas d'erreur
+        return json_encode([
+            'error' => $e->getMessage(),
+            'raw_response' => $response->body() ?? null
+        ]);
+    }
+}
+
+    /**
+     * Obtenir la liste des modèles disponibles
+     */
+    public function listModels()
+    {
+        $config = config('services.gemini');
+        
+        if (empty($config['key'])) {
+            throw new \Exception('Clé API Gemini non configurée');
         }
     }
 
@@ -366,24 +432,29 @@ class AIController extends Controller
      */
     private function buildOffreAnalysisPrompt($offre): string
     {
-        return "
-        Analyse cette offre de stage et fournis une réponse structurée en JSON :
+        return <<<PROMPT
+        Analyse cette offre de stage et retourne un JSON structuré avec :
+        - competences: liste des compétences techniques identifiées
+        - niveau_difficulte: [debutant|intermediaire|avance]
+        - mots_cles: 5 mots-clés principaux
+        - suggestions_amelioration: 3 suggestions pour améliorer l'offre
+        - score_pertinence: score de 0 à 100
         
+        Offre à analyser :
         Titre: {$offre->titre}
         Description: {$offre->description}
-        Exigences: " . ($offre->exigences ?: 'Non spécifiées') . "
-        Compétences requises: " . ($offre->competences_requises ?: 'Non spécifiées') . "
-        Secteur: " . ($offre->getSecteur ? $offre->getSecteur->nom : 'Non spécifié') . "
+        Compétences requises: " . (is_array($offre->competences_requises) ? implode(', ', $offre->competences_requises) : ($offre->competences_requises ?: 'Non spécifiées')) . "
+        Exigences: {$offre->exigences}
         
-        Réponds avec un JSON contenant:
+        Exemple de réponse attendue :
         {
-            \"competences\": [\"liste des compétences identifiées\"],
-            \"niveau_difficulte\": \"debutant|intermediaire|avance\",
-            \"mots_cles\": [\"mots-clés importants\"],
-            \"suggestions_amelioration\": [\"suggestions pour améliorer l'offre\"],
-            \"score_pertinence\": 85
+        "competences": ["Marketing Digital", "Réseaux Sociaux"],
+        "niveau_difficulte": "intermediaire",
+        "mots_cles": ["digital", "stage", "marketing"],
+        "suggestions_amelioration": ["Préciser les outils à maîtriser", "Ajouter des exemples de missions"],
+        "score_pertinence": 75
         }
-        ";
+        PROMPT;
     }
 
     /**
@@ -396,7 +467,7 @@ class AIController extends Controller
         
         OFFRE:
         Titre: {$candidature->offreStage->titre}
-        Compétences requises: " . ($candidature->offreStage->competences_requises ?: 'Non spécifiées') . "
+        Compétences requises: " . (is_array($candidature->offreStage->competences_requises) ? implode(', ', $candidature->offreStage->competences_requises) : ($candidature->offreStage->competences_requises ?: 'Non spécifiées')) . "
         
         CANDIDATURE:
         CV: " . ($candidature->cv_path ?: 'Non fourni') . "
@@ -472,9 +543,20 @@ class AIController extends Controller
         ";
 
         try {
-            $keywords = $this->callGeminiAPI($prompt);
-            return is_array($keywords) ? $keywords : [$query];
+            $keywordsResponse = $this->callGeminiAPI($prompt);
+            
+            // Nettoyer la réponse et essayer de la décoder
+            $cleaned = str_replace(['```json', '```'], '', $keywordsResponse);
+            $decoded = json_decode($cleaned, true);
+            
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+            
+            // Si le décodage échoue, retourner la requête originale
+            return [$query];
         } catch (\Exception $e) {
+            Log::error('Erreur extraction mots-clés: ' . $e->getMessage());
             return [$query];
         }
     }

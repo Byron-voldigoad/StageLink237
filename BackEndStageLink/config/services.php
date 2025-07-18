@@ -30,4 +30,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'google' => [
+    'application_credentials' => env('GOOGLE_APPLICATION_CREDENTIALS'),
+    'project_id' => env('GOOGLE_CLOUD_PROJECT_ID'),
+    ],
+
+   'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'url' => env('GEMINI_API_URL'),
+    ],
+
 ];

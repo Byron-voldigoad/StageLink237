@@ -23,6 +23,9 @@ use App\Http\Controllers\SecteurController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::options('/{any}', function() {
+    return response()->json();
+})->where('any', '.*');
 
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);

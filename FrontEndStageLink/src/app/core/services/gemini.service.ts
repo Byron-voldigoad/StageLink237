@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, forkJoin } from 'rxjs';
+import { Observable, of, forkJoin, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
@@ -40,13 +40,10 @@ export interface CandidatureAnalysis {
 
 export interface CVAnalysis {
   score_pertinence: number; // Score de 0 à 100
-  competences_detectees: string[];
-  experience_pertinente: string[];
+  competences: string[];
   points_forts: string[];
   points_faibles: string[];
   recommandations: string[];
-  niveau_adequation: 'excellent' | 'bon' | 'moyen' | 'faible';
-  temps_formation_estime: string;
 }
 
 export interface TutoratRecommendation {
@@ -56,11 +53,17 @@ export interface TutoratRecommendation {
   ressources_utiles: string[];
 }
 
+export interface ApiResponse<T> {
+  success: boolean;
+  error?: string;
+  analysis?: T;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class GeminiService {
-  private readonly GEMINI_PROXY_URL = '/api/ai/analyze-offre';
+  private readonly API_BASE_URL  = 'http://localhost:8000/api/ai';
 
   constructor(private http: HttpClient) {}
 
@@ -122,92 +125,63 @@ export class GeminiService {
    * Génère une lettre de motivation IA pour une offre donnée
    */
   generateMotivation(offreId: number): Observable<{ motivation: string }> {
-    const token = localStorage.getItem('token');
-    const headersConfig: any = {
-      'Content-Type': 'application/json'
-    };
-    if (token) {
-      headersConfig['Authorization'] = `Bearer ${token}`;
-    }
-    const headers = new HttpHeaders(headersConfig);
     return this.http.post<{ motivation: string }>(
-      '/api/ai/generate-motivation',
-      { offre_id: offreId },
-      { headers }
+      `${this.API_BASE_URL}/generate-motivation`,
+      { offre_id: offreId }
     );
   }
 
-  /**
-   * Analyse un CV pour évaluer sa pertinence par rapport à une offre
-   */
-  analyzeCV(cvPath: string, offre: any): Observable<CVAnalysis> {
-    const token = localStorage.getItem('token');
-    const headersConfig: any = {
-      'Content-Type': 'application/json'
-    };
-    if (token) {
-      headersConfig['Authorization'] = `Bearer ${token}`;
-    }
-    const headers = new HttpHeaders(headersConfig);
-    
-    const payload = {
-      cv_path: cvPath,
-      offre_id: offre.id_offre_stage,
-      titre_offre: offre.titre,
-      description_offre: offre.description,
-      competences_requises: offre.competences_requises,
-      exigences: offre.exigences
-    };
+ /**
+ * Analyse un CV pour évaluer sa pertinence par rapport à une offre
+ */
+analyzeCV(cvPath: string, offerId: number): Observable<CVAnalysis> {
+  return this.http.post<{success: boolean, analysis: CVAnalysis}>(
+    `${this.API_BASE_URL}/analyze-cv`, 
+    { cv_path: cvPath, offre_id: offerId }
+  ).pipe(
+    map(response => {
+      if (!response.success || !response.analysis) {
+        throw new Error('Échec de l\'analyse du CV');
+      }
+      return response.analysis;
+    }),
+    catchError(error => {
+      console.error('Erreur analyse CV:', error);
+      return of(this.getDefaultCVAnalysis());
+    })
+  );
+}
 
-    return this.http.post<any>(
-      '/api/ai/analyze-cv',
-      payload,
-      { headers }
-    ).pipe(
-      map(response => this.parseCVAnalysis(response)),
-      catchError(error => {
-        console.error('Erreur analyse CV:', error);
-        return of(this.getDefaultCVAnalysis());
-      })
-    );
-  }
+
+
 
   /**
    * Analyse tous les CV d'une offre et les classe par pertinence
    */
   analyzeAndRankCandidatures(candidatures: any[], offre: any): Observable<any[]> {
-    const analyses = candidatures.map(candidature => 
-      this.analyzeCV(candidature.cv_path || '', offre).pipe(
-        map(analysis => ({
-          ...candidature,
-          analysis: analysis,
-          score: analysis.score_pertinence
-        }))
-      )
-    );
+  const analyses = candidatures.map(candidature => 
+    this.analyzeCV(candidature.cv_path || '', offre.id_offre_stage).pipe( // ← Envoie seulement l'ID
+      map(analysis => ({
+        ...candidature,
+        analysis: analysis,
+        score: analysis.score_pertinence
+      }))
+    )
+  );
 
-    return forkJoin(analyses).pipe(
-      map(results => results.sort((a, b) => b.score - a.score))
-    );
-  }
+  return forkJoin(analyses).pipe(
+    map(results => results.sort((a, b) => b.score - a.score))
+  );
+}
 
   /**
    * Appel au backend Laravel qui fait le proxy Gemini
    */
   private callGeminiAPI(offreId: number): Observable<string> {
     const body = { offre_id: offreId };
-    const token = localStorage.getItem('token'); // Récupère le token stocké après login
-    const headersConfig: any = {
-      'Content-Type': 'application/json'
-    };
-    if (token) {
-      headersConfig['Authorization'] = `Bearer ${token}`;
-    }
-    const headers = new HttpHeaders(headersConfig);
     return this.http.post<any>(
-      this.GEMINI_PROXY_URL,
-      body,
-      { headers }
+      `${this.API_BASE_URL}/analyze-offre`,
+      body
     ).pipe(
       map(response => {
         // On récupère le vrai texte JSON
@@ -288,13 +262,10 @@ export class GeminiService {
   private getDefaultCVAnalysis(): CVAnalysis {
     return {
       score_pertinence: 50,
-      competences_detectees: [],
-      experience_pertinente: [],
+      competences: [],
       points_forts: [],
       points_faibles: [],
-      recommandations: [],
-      niveau_adequation: 'moyen',
-      temps_formation_estime: 'Inconnu'
+      recommandations: []
     };
   }
 } 

@@ -35,7 +35,7 @@ php artisan tinker
 Puis testez :
 
 ```php
-echo env('GEMINI_API_KEY');
+echo env('AIzaSyAJWDp9BYAe1QREiNhFJcRPDGnAcvZeYQY');
 ```
 
 Si la clé s'affiche correctement, la configuration est bonne.

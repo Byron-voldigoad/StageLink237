@@ -215,7 +215,7 @@ class AIController extends Controller
             return response()->json(['error' => 'Offre non trouvée'], 404);
         }
 
-        $prompt = "Génère une lettre de motivation professionnelle pour le poste suivant :\n\n";
+        $prompt = "Génère une lettre de motivation professionnelle mais simple pour le poste suivant :\n\n";
         $prompt .= "Titre du poste : {$offre->titre}\n";
         $prompt .= "Entreprise : {$offre->entreprise->nom}\n";
         $prompt .= "Description : {$offre->description}\n";
@@ -234,8 +234,9 @@ class AIController extends Controller
         $prompt .= "- Professionnelle et convaincante\n";
         $prompt .= "- Adaptée au poste et à l'entreprise\n";
         $prompt .= "- En français\n";
-        $prompt .= "- D'environ 300-400 mots\n";
+        $prompt .= "- D'environ 100-200 mots\n";
         $prompt .= "- Structurée avec une introduction, un développement et une conclusion\n";
+        $prompt .= "- Et prêt à l'emploi donc l'utilisateur ne doit plus avoir besoin de la modifier\n";
 
         $response = $this->callGeminiAPI($prompt);
         
@@ -265,13 +266,6 @@ class AIController extends Controller
 
             $offre = OffreStage::findOrFail($request->offre_id);
             
-            // Débogage pour identifier les champs problématiques
-            Log::info('Débogage offre:', [
-                'titre' => is_string($offre->titre) ? 'string' : gettype($offre->titre),
-                'description' => is_string($offre->description) ? 'string' : gettype($offre->description),
-                'competences_requises' => is_string($offre->competences_requises) ? 'string' : gettype($offre->competences_requises),
-                'exigences' => is_string($offre->exigences) ? 'string' : gettype($offre->exigences),
-            ]);
             
             $cvContent = $this->extractTextFromPDF($request->cv_path);
 
@@ -281,7 +275,7 @@ class AIController extends Controller
             // Formatage strict de la réponse
             $analysis = $this->formatGeminiResponse($geminiResponse);
             
-            if (!isset($analysis['score_pertinence'])) {
+            if (!isset($analysis['score_pertinence']) || !isset($decoded['niveau_adequation'])) {
                 throw new \Exception("Réponse de l'IA incomplète");
             }
 
@@ -306,13 +300,6 @@ class AIController extends Controller
 
 private function buildCVAnalysisPrompt($offre, $cvContent): string
 {
-    // Débogage pour identifier les champs problématiques
-    Log::info('Débogage buildCVAnalysisPrompt:', [
-        'titre_type' => gettype($offre->titre),
-        'description_type' => gettype($offre->description),
-        'competences_requises_type' => gettype($offre->competences_requises),
-        'cvContent_type' => gettype($cvContent),
-    ]);
     
     // S'assurer que competences_requises est une chaîne
     $competencesRequises = $offre->competences_requises;
@@ -327,13 +314,22 @@ private function buildCVAnalysisPrompt($offre, $cvContent): string
     $description = is_string($offre->description) ? $offre->description : (string)$offre->description;
     $cvContentStr = is_string($cvContent) ? $cvContent : (string)$cvContent;
 
-    return "Analyse ce CV par rapport à cette offre:\n\n"
-        . "Titre Offre: {$titre}\n"
-        . "Description: {$description}\n"
-        . "Compétences Requises: {$competencesRequises}\n\n"
-        . "Contenu du CV:\n{$cvContentStr}\n\n"
-        . "Retourne UNIQUEMENT un JSON valide avec ces champs: "
-        . "score_pertinence (0-100), competences, points_forts, points_faibles, recommandations";
+    return "Tu es un expert en analyse de CV. Analyse ce CV pour une offre de stage et retourne UNIQUEMENT un JSON STRICTEMENT VALIDE avec les champs suivants:
+    {
+        \"score_pertinence\": 0-100, // Score global de pertinence
+        \"niveau_adequation\": \"faible\"|\"moyen\"|\"élevé\", // Niveau global d'adéquation
+        \"competences\": [\"liste\", \"des\", \"compétences\"], 
+        \"points_forts\": [\"points\", \"forts\"],
+        \"points_faibles\": [\"points\", \"faibles\"],
+        \"recommandations\": [\"recommandations\"]
+    }
+
+    Offre: {$titre}
+    Description: {$description}
+    Compétences requises: {$competencesRequises}
+
+    Contenu du CV:
+    {$cvContentStr}";
 }
 
 private function formatGeminiResponse(string $jsonResponse)
@@ -348,6 +344,31 @@ private function formatGeminiResponse(string $jsonResponse)
     if (is_string($decoded)) {
         $cleaned = str_replace(['```json', '```'], '', $decoded);
         $decoded = json_decode($cleaned, true);
+    }
+
+     $requiredFields = [
+        'score_pertinence', 
+        'niveau_adequation',
+        'competences',
+        'points_forts',
+        'points_faibles',
+        'recommandations'
+    ];
+
+    foreach ($requiredFields as $field) {
+        if (!array_key_exists($field, $decoded)) {
+            Log::error('Champ manquant dans la réponse', [
+                'champ_manquant' => $field,
+                'reponse_complete' => $decoded
+            ]);
+            throw new \Exception("Réponse de l'IA incomplète: champ $field manquant");
+        }
+    }
+
+    // Validation supplémentaire pour niveau_adequation
+    $niveauxValides = ['faible', 'moyen', 'élevé'];
+    if (!in_array(strtolower($decoded['niveau_adequation']), $niveauxValides)) {
+        throw new \Exception("niveau_adequation invalide");
     }
     
     return $decoded;

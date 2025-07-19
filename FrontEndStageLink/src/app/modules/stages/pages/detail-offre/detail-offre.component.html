@@ -326,8 +326,8 @@
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-gray-900">Liste des candidats</h2>
         <div class="flex space-x-2">
-          <button (click)="setViewMode('table')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'table', 'bg-gray-100 text-gray-700': viewMode !== 'table'}" class="px-3 py-1 rounded-l-md font-medium">Tableau</button>
-          <button (click)="setViewMode('cards')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'cards', 'bg-gray-100 text-gray-700': viewMode !== 'cards'}" class="px-3 py-1 rounded-r-md font-medium">Cartes</button>
+          <!-- <button (click)="setViewMode('table')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'table', 'bg-gray-100 text-gray-700': viewMode !== 'table'}" class="px-3 py-1 rounded-l-md font-medium">Tableau</button> -->
+          <!-- <button (click)="setViewMode('cards')" [ngClass]="{'bg-red-100 text-red-700': viewMode === 'cards', 'bg-gray-100 text-gray-700': viewMode !== 'cards'}" class="px-3 py-1 rounded-r-md font-medium">Cartes</button> -->
           <button (click)="toggleAnalysisView()" 
                   [disabled]="analyzingCVs"
                   class="px-4 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium">
@@ -352,8 +352,8 @@
       <div *ngIf="!candidatsLoading && !candidatsError && candidats.length === 0" class="text-gray-500 py-8 text-center">Aucun candidat pour cette offre.</div>
 
       <!-- Affichage Tableau -->
-      <div *ngIf="viewMode === 'table' && candidats.length > 0" class="overflow-x-auto">
-        <table class="min-w-full bg-white rounded-lg shadow-sm">
+      <div *ngIf="viewMode === 'table' && candidats.length > 0" class="overflow-x-auto shadow-sm rounded-lg border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200 bg-white">
           <thead>
             <tr class="bg-gray-100">
               <th class="px-4 py-2 text-left">Nom</th>

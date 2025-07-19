@@ -29,6 +29,7 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'register-user', component: RegisterUserComponent },
   { path: 'register-entreprise', loadComponent: () => import('./features/auth/register-entreprise/register-entreprise.component').then(m => m.RegisterEntrepriseComponent) },
+  {path: 'utilisateurs', canActivate: [authGuard], loadComponent: () => import('./modules/utilisateurs/utilisateurs.component').then(m => m.UtilisateursComponent) },
   { 
     path: 'dashboard', 
     component: DashboardHomeComponent,

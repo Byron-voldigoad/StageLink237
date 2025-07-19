@@ -119,6 +119,8 @@ Route::middleware('auth:sanctum')->group(function () {
 // Route publique pour l'inscription utilisateur
 Route::post('utilisateurs', [App\Http\Controllers\UtilisateurController::class, 'store']);
 Route::post('entreprises', [App\Http\Controllers\EntrepriseController::class, 'store']);
+Route::post('/utilisateurs/{id}/roles', [App\Http\Controllers\UtilisateurController::class, 'addRole']);
+Route::delete('/utilisateurs/{id}/roles', [App\Http\Controllers\UtilisateurController::class, 'removeRole']);
 
 // Routes pour l'IA (protégées par authentification)
 Route::middleware('auth:sanctum')->prefix('ai')->group(function () {

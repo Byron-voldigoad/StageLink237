@@ -33,7 +33,7 @@ export class DetailOffreComponent implements OnInit {
   candidatsLoading = false;
   candidatsError: string | null = null;
   activeTab: 'detail' | 'candidats' = 'detail';
-  viewMode: 'table' | 'cards' = 'table';
+  viewMode=  'cards' ;
   isAdmin: boolean = false;
   isEntrepriseProprietaire: boolean = false;
   isEtudiant: boolean = false;
@@ -222,7 +222,7 @@ export class DetailOffreComponent implements OnInit {
   }
 
   // Ajout : méthode pour changer le mode d'affichage
-  setViewMode(mode: 'table' | 'cards') {
+  setViewMode(mode: 'cards') {
     this.viewMode = mode;
   }
 

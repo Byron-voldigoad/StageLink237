@@ -32,7 +32,7 @@ class ProfilTuteur extends Model
 
     public function utilisateur()
     {
-        return $this->belongsTo(Utilisateur::class, 'id_utilisateur', 'id_utilisateur');
+        return $this->belongsTo(Utilisateur::class, 'utilisateur_id', 'id_utilisateur');
     }
 
     public function matieres()

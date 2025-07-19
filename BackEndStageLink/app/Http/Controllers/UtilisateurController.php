@@ -13,7 +13,8 @@ class UtilisateurController extends Controller
      */
     public function index()
     {
-        return Utilisateur::with(['roles', 'profilEtudiant', 'profilTuteur', 'entreprise'])->get();
+        // Retourne les utilisateurs avec leurs rôles (sans profils)
+        return Utilisateur::with('roles')->get();
     }
 
     /**

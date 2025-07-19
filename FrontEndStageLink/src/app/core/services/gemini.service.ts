@@ -40,6 +40,7 @@ export interface CandidatureAnalysis {
 
 export interface CVAnalysis {
   score_pertinence: number; // Score de 0 à 100
+  niveau_adequation: 'faible' | 'moyen' | 'élevé';
   competences: string[];
   points_forts: string[];
   points_faibles: string[];
@@ -146,10 +147,22 @@ analyzeCV(cvPath: string, offerId: number): Observable<CVAnalysis> {
       return response.analysis;
     }),
     catchError(error => {
-      console.error('Erreur analyse CV:', error);
-      return of(this.getDefaultCVAnalysis());
+      if (error.status === 429) {
+        return of(this.getQuotaExceededResponse());
+      }
+      return throwError(() => new Error('Erreur d\'analyse'));
     })
   );
+}
+private getQuotaExceededResponse(): CVAnalysis {
+  return {
+    score_pertinence: 0,
+    niveau_adequation: 'faible',
+    competences: ['Analyse non disponible'],
+    points_forts: ['Quota API dépassé'],
+    points_faibles: ['Mettez à jour votre abonnement Gemini'],
+    recommandations: ['Contactez l\'administrateur']
+  };
 }
 
 
@@ -262,6 +275,7 @@ analyzeCV(cvPath: string, offerId: number): Observable<CVAnalysis> {
   private getDefaultCVAnalysis(): CVAnalysis {
     return {
       score_pertinence: 50,
+      niveau_adequation: 'moyen',
       competences: [],
       points_forts: [],
       points_faibles: [],

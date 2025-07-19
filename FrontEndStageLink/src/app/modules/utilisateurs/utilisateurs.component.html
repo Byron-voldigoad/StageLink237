@@ -1,0 +1,144 @@
+<div class="max-w-5xl mx-auto p-4">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-2">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl font-bold text-primary flex items-center">
+        <svg class="w-7 h-7 mr-2 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7V7a4 4 0 10-8 0v2m12 0a4 4 0 01-8 0m8 0v2a4 4 0 01-8 0V9"></path></svg>
+        Utilisateurs
+      </span>
+    </div>
+    <div class="flex gap-2 w-full sm:w-auto">
+      <input type="text" [(ngModel)]="searchTerm" (input)="applyFilter()" placeholder="Rechercher..." class="border border-gray-300 rounded-lg px-3 py-2 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-primary" />
+      <select [(ngModel)]="roleFilter" (change)="applyFilter()" class="border border-gray-300 rounded-lg px-3 py-2 w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-primary">
+        <option [ngValue]="null">Tous les rôles</option>
+        <option *ngFor="let role of allRoles" [ngValue]="role.id_role">{{ role.nom_role }}</option>
+      </select>
+      <button (click)="openCreateModal()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition flex items-center gap-1">
+        <span class="material-icons text-base">add</span> Ajouter
+      </button>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  <div *ngIf="error" class="bg-red-100 text-red-700 px-4 py-2 rounded mb-2 flex items-center gap-2">
+    <span class="material-icons">error_outline</span> {{ error }}
+  </div>
+  <div *ngIf="success" class="bg-green-100 text-green-700 px-4 py-2 rounded mb-2 flex items-center gap-2">
+    <span class="material-icons">check_circle</span> {{ success }}
+  </div>
+  <div *ngIf="loading" class="flex justify-center items-center my-6">
+    <span class="animate-spin h-8 w-8 border-4 border-t-4 border-primary rounded-full"></span>
+    <span class="ml-2 text-primary font-semibold">Chargement...</span>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto rounded-xl shadow bg-white">
+    <table class="min-w-full">
+      <thead class="bg-gray-100 sticky top-0 z-10">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+          <th class="px-4 py-3 text-left font-semibold text-gray-700">Nom</th>
+          <th class="px-4 py-3 text-left font-semibold text-gray-700">Prénom</th>
+          <th class="px-4 py-3 text-left font-semibold text-gray-700">Email</th>
+          <th class="px-4 py-3 text-left font-semibold text-gray-700">Rôle(s)</th>
+          <th class="px-4 py-3 text-left font-semibold text-gray-700">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let utilisateur of paginatedUtilisateurs" class="border-b hover:bg-gray-50 transition">
+          <td class="px-4 py-2">{{ utilisateur.id_utilisateur }}</td>
+          <td class="px-4 py-2 font-medium">{{ utilisateur.nom }}</td>
+          <td class="px-4 py-2">{{ utilisateur.prenom }}</td>
+          <td class="px-4 py-2">{{ utilisateur.email }}</td>
+          <td class="px-4 py-2">
+            <ng-container *ngIf="utilisateur.roles && utilisateur.roles.length > 0; else noRole">
+              <span *ngFor="let role of utilisateur.roles" class="inline-block bg-primary/10 text-primary text-xs font-semibold rounded-full px-2 py-1 mr-1 mb-1">
+                {{ role.nom_role }}
+              </span>
+            </ng-container>
+            <ng-template #noRole><span class="text-gray-400 italic">Aucun</span></ng-template>
+          </td>
+          <td class="px-4 py-2 flex gap-2">
+            <button (click)="openEditModal(utilisateur)" class="flex items-center gap-1 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition">
+              <span class="material-icons text-base">edit</span> Éditer
+            </button>
+            <button (click)="deleteUtilisateur(utilisateur.id_utilisateur)" class="flex items-center gap-1 px-3 py-1 rounded-lg bg-red-50 text-red-700 hover:bg-red-100 transition">
+              <span class="material-icons text-base">delete</span> Supprimer
+            </button>
+            <button (click)="openRoleModal(utilisateur)" class="flex items-center gap-1 px-3 py-1 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 transition">
+              <span class="material-icons text-base">security</span> Gérer les rôles
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="paginatedUtilisateurs.length === 0">
+          <td colspan="6" class="text-center py-6 text-gray-400">Aucun utilisateur trouvé.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-center items-center gap-2 mt-6" *ngIf="totalPages > 1">
+    <button (click)="page = page - 1" [disabled]="page === 1" class="px-2 py-1 rounded border bg-gray-100 disabled:opacity-50">&lt;</button>
+    <span *ngFor="let p of [].constructor(totalPages); let i = index" (click)="page = i + 1" [class.font-bold]="page === i + 1" class="cursor-pointer px-2">{{ i + 1 }}</span>
+    <button (click)="page = page + 1" [disabled]="page === totalPages" class="px-2 py-1 rounded border bg-gray-100 disabled:opacity-50">&gt;</button>
+  </div>
+
+  <!-- Modal -->
+  <div *ngIf="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
+      <button (click)="closeModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+      <h2 class="text-xl font-bold mb-6 text-primary">{{ isEditMode ? 'Éditer' : 'Ajouter' }} un utilisateur</h2>
+      <form (ngSubmit)="submitForm()" #f="ngForm" autocomplete="off">
+        <div class="mb-4">
+          <label class="block mb-1 font-medium">Nom</label>
+          <input type="text" [(ngModel)]="utilisateurForm.nom" name="nom" required class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1 font-medium">Prénom</label>
+          <input type="text" [(ngModel)]="utilisateurForm.prenom" name="prenom" required class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div class="mb-4">
+          <label class="block mb-1 font-medium">Email</label>
+          <input type="email" [(ngModel)]="utilisateurForm.email" name="email" required class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div class="mb-4" *ngIf="!isEditMode">
+          <label class="block mb-1 font-medium">Mot de passe</label>
+          <input type="password" [(ngModel)]="utilisateurForm.mot_de_passe" name="mot_de_passe" required class="border rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary" />
+        </div>
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" (click)="closeModal()" class="px-4 py-2 rounded-lg border">Annuler</button>
+          <button type="submit" [disabled]="f.invalid || loading" class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark disabled:opacity-50">{{ isEditMode ? 'Enregistrer' : 'Créer' }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal gestion des rôles -->
+  <div *ngIf="showRoleModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative">
+      <button (click)="closeRoleModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+      <h2 class="text-xl font-bold mb-6 text-primary">Gérer les rôles de {{ roleModalUser?.prenom }} {{ roleModalUser?.nom }}</h2>
+      <div class="mb-4">
+        <label class="block mb-2 font-medium">Rôles actuels :</label>
+        <div class="flex flex-wrap gap-2 mb-2">
+          <span *ngFor="let role of roleModalUser?.roles" class="inline-flex items-center bg-primary/10 text-primary text-xs font-semibold rounded-full px-2 py-1">
+            {{ role.nom_role }}
+            <button (click)="removeRoleFromUser(role.id_role)" class="ml-1 text-red-500 hover:text-red-700" title="Retirer ce rôle"><span class="material-icons text-xs">close</span></button>
+          </span>
+          <span *ngIf="hasNoRoles()" class="text-gray-400 italic">Aucun</span>
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block mb-2 font-medium">Ajouter un rôle :</label>
+        <select [(ngModel)]="selectedRoleId" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary">
+          <option [ngValue]="null">Sélectionner un rôle</option>
+          <option *ngFor="let role of allRoles" [ngValue]="role.id_role" [disabled]="hasUserRole(role.id_role)">{{ role.nom_role }}</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-2 mt-6">
+        <button type="button" (click)="closeRoleModal()" class="px-4 py-2 rounded-lg border">Fermer</button>
+        <button type="button" (click)="addRoleToUser()" [disabled]="!selectedRoleId" class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary-dark disabled:opacity-50">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div>

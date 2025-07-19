@@ -18,6 +18,7 @@ export class SidebarComponent {
     { name: 'Offres de stage', icon: 'work', link: '/stages' },
     { name: "Sujets d'examen", icon: 'book', link: '/sujets' },
     { name: 'Tutorat', icon: 'school', link: '/tutorats' },
+    { name: 'Utilisateurs', icon: 'group', link: '/utilisateurs' },
     { name: 'Profil', icon: 'person', link: '/profil' },
     // Ajoutez d'autres liens selon vos besoins
   ];

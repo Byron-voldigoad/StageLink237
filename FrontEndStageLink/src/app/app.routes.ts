@@ -85,14 +85,9 @@ export const routes: Routes = [
     loadChildren: () => import('./modules/sujet/sujet.module').then((m) => m.SujetModule)
   },
   {
-    path: 'messages',
-    canActivate: [authGuard],
-    loadComponent: () => import('./modules/tuteur/tuteur.component').then((m) => m.TuteurComponent)
-  },
-  {
     path: 'profil',
     canActivate: [authGuard],
-    loadComponent: () => import('./modules/etudiant/etudiant.component').then((m) => m.EtudiantComponent)
+    loadComponent: () => import('./modules/profil/profil.component').then((m) => m.ProfilComponent)
   },
   {
     path: 'mes-postulations',

@@ -55,6 +55,10 @@ export class AuthService {
     return this.userSubject.value;
   }
 
+  setUser(user: any) {
+    this.userSubject.next(user);
+  }
+
   getEtudiantId(): number | null {
     const user = this.getUser();
     return user && user.etudiant_id ? user.etudiant_id : null;

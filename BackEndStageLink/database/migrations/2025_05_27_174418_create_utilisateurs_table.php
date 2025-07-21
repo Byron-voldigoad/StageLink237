@@ -20,6 +20,7 @@ class CreateUtilisateursTable extends Migration
             $table->string('email', 255)->unique();
             $table->string('mot_de_passe', 255);
             $table->string('telephone', 20)->nullable();
+            $table->string('photo', 255)->nullable(); // Ajouté pour la photo de profil
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

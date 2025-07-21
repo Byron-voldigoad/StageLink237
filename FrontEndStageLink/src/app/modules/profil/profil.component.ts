@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../auth/auth.service';
 import { UtilisateursService } from '../../modules/utilisateurs/services/utilisateurs.services';
 import { environment } from '../../../environments/environment';
@@ -22,7 +23,11 @@ export class ProfilComponent implements OnInit {
   editPhotoPreview: string | null = null;
   tofUrl = 'http://localhost:8000/storage/';
 
-  constructor(private authService: AuthService, private utilisateursService: UtilisateursService) {}
+  constructor(
+    private authService: AuthService, 
+    private utilisateursService: UtilisateursService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
     this.user = this.authService.getUser();
@@ -130,6 +135,9 @@ export class ProfilComponent implements OnInit {
     if (this.editUser.photoFile) {
       const formData = new FormData();
       
+      // Ajouter la méthode spoofing pour Laravel
+      formData.append('_method', 'PUT');
+      
       // Ajouter les données du formulaire
       formData.append('nom', this.editUser.nom || '');
       formData.append('prenom', this.editUser.prenom || '');
@@ -147,7 +155,8 @@ export class ProfilComponent implements OnInit {
         formData: Array.from(formData.entries())
       });
       
-      obs = this.utilisateursService.updateUtilisateur(this.user.id_utilisateur, formData);
+      // Utiliser la méthode POST avec le FormData qui contient _method=PUT
+      obs = this.http.post<any>(`${environment.apiUrl}/utilisateurs/${this.user.id_utilisateur}`, formData);
     } else {
       // Filtrer les champs non définis
       const filteredData = Object.fromEntries(
@@ -182,7 +191,7 @@ export class ProfilComponent implements OnInit {
           this.adminError = response.message || 'Erreur lors de la mise à jour du profil';
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Erreur lors de la mise à jour du profil:', err);
         this.adminError = err.error?.message || 'Une erreur est survenue lors de la mise à jour du profil';
         

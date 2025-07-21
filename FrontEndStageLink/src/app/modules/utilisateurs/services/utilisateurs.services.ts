@@ -34,19 +34,10 @@ export class UtilisateursService {
 
   updateUtilisateur(id: number, utilisateur: Partial<Utilisateur> | FormData): Observable<Utilisateur> {
     if (utilisateur instanceof FormData) {
-      // Pour les requêtes avec fichiers, on utilise POST avec _method=PUT
-      // car Laravel a des problèmes avec les fichiers en PUT
-      utilisateur.append('_method', 'PUT');
-      return this.http.post<Utilisateur>(`${this.apiUrl}/${id}`, utilisateur, {
-        headers: {
-          // Ne pas définir Content-Type, le navigateur le fera automatiquement
-          // avec la bonne boundary pour FormData
-        }
-      }).pipe(
+      return this.http.put<Utilisateur>(`${this.apiUrl}/${id}`, utilisateur).pipe(
         catchError(this.handleError)
       );
     } else {
-      // Pour les requêtes sans fichier, on garde PUT normal
       return this.http.put<Utilisateur>(`${this.apiUrl}/${id}`, utilisateur).pipe(
         catchError(this.handleError)
       );

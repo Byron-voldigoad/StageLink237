@@ -1,0 +1,91 @@
+<div class="p-4 bg-gray-50 min-h-screen">
+  <h2 class="text-2xl font-bold mb-6">Dashboard Étudiant</h2>
+
+  <!-- Statistiques étudiant -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow p-6 flex flex-col items-center">
+      <span class="material-icons text-4xl text-primary mb-2">work</span>
+      <div class="text-2xl font-bold">{{ offresStage }}</div>
+      <div class="text-gray-600">Offres de stage disponibles</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 flex flex-col items-center">
+      <span class="material-icons text-4xl text-green-500 mb-2">school</span>
+      <div class="text-2xl font-bold">{{ offresTutorat }}</div>
+      <div class="text-gray-600">Offres de tutorat disponibles</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 flex flex-col items-center">
+      <span class="material-icons text-4xl text-accent mb-2">assignment</span>
+      <div class="text-2xl font-bold">{{ candidatures }}</div>
+      <div class="text-gray-600">Candidatures envoyées</div>
+    </div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="flex flex-wrap gap-4 mb-8">
+    <button
+      (click)="voirOffresStage()"
+      class="px-4 py-2 bg-primary text-white rounded-lg flex items-center gap-2"
+    >
+      <span class="material-icons">work</span>
+      Voir les offres de stage
+    </button>
+    <button
+      (click)="voirOffresTutorat()"
+      class="px-4 py-2 bg-primary text-white rounded-lg flex items-center gap-2"
+    >
+      <span class="material-icons">school</span>
+      Voir les offres de tutorat
+    </button>
+    <button
+      (click)="voirCandidatures()"
+      class="px-4 py-2 bg-primary text-white rounded-lg flex items-center gap-2"
+    >
+      <span class="material-icons">description</span>
+      Voir mes candidatures
+    </button>
+    <button
+      (click)="voirExamens()"
+      class="px-4 py-2 bg-primary text-white rounded-lg flex items-center gap-2"
+    >
+      <span class="material-icons">assignment</span>
+      Consulter les sujets d'examen
+    </button>
+  </div>
+
+  <!-- Liste des candidatures -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-lg font-semibold mb-4">Mes candidatures récentes</h3>
+    <div *ngIf="loading" class="text-center py-4">
+      <span class="material-icons animate-spin">refresh</span>
+    </div>
+    <ul *ngIf="!loading && candidaturesRecentes.length > 0" class="space-y-4">
+      <li
+        *ngFor="let candidature of candidaturesRecentes"
+        class="flex items-center justify-between border-b pb-4"
+      >
+        <div>
+          <div class="font-medium">{{ candidature.titre }}</div>
+          <div
+            class="text-sm"
+            [ngClass]="{
+              'text-yellow-600': candidature.statut === 'En attente',
+              'text-green-600': candidature.statut === 'Accepté',
+              'text-red-600': candidature.statut === 'Refusé'
+            }"
+          >
+            {{ candidature.statut }}
+          </div>
+        </div>
+        <span class="material-icons text-gray-400">
+          {{ candidature.type === "stage" ? "work" : "school" }}
+        </span>
+      </li>
+    </ul>
+    <div
+      *ngIf="!loading && candidaturesRecentes.length === 0"
+      class="text-gray-500 italic text-center py-4"
+    >
+      Vous n'avez pas encore de candidatures
+    </div>
+  </div>
+</div>

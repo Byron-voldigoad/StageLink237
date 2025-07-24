@@ -10,7 +10,13 @@ class SujetsExamenSeeder extends Seeder
 {
     public function run()
     {
-        // On suppose que les IDs 1 existent pour chaque entité (matiere, niveau, annee, utilisateur)
+        $matieres = \App\Models\Matiere::all();
+        $niveaux = \App\Models\Niveau::all();
+        $annees = \App\Models\AnneeAcademique::all();
+        $tuteurs = \App\Models\Utilisateur::whereHas('roles', function($q) {
+            $q->where('nom_role', 'tuteur');
+        })->get();
+
         $sujets = [
             [
                 'titre' => 'Sujet Mathématiques 2023',
@@ -23,19 +29,33 @@ class SujetsExamenSeeder extends Seeder
                 'id_upload_par' => 1,
                 'approuve' => true,
                 'telechargements' => 10,
+                'fichier_path' => 'docs/8akqcXmjXIdANE1MKfkEaxm2F7Lh5pOJ1yr3fdK1.pdf',
                 'created_at' => now(),
             ],
             [
-                'titre' => 'Sujet Physique 2024',
+                'titre' => 'Sujet Physique Avancée 2024',
                 'id_matiere' => 2,
-                'id_niveau' => 2,
+                'id_niveau' => 13, // Bac+4
                 'id_annee' => 3,
-                'fichier_path' => 'sujets/physique_2024.pdf',
+                'fichier_path' => 'docs/31K9UcAlCcAdPkGCxLCRObViyAZGqTs87QrbEylg.pdf',
                 'est_gratuit' => false,
-                'prix' => 500,
+                'prix' => 1500,
                 'id_upload_par' => 2,
-                'approuve' => false,
-                'telechargements' => 2,
+                'approuve' => true,
+                'telechargements' => 25,
+                'created_at' => now(),
+            ],
+            [
+                'titre' => 'Sujet Informatique - Algorithmique',
+                'id_matiere' => 5,
+                'id_niveau' => 11, // Bac+2
+                'id_annee' => 3,
+                'fichier_path' => 'docs/FtqC8K85AnmSaVU9sD0o1frZMqUeOC1B4a9wUqK4.pdf',
+                'est_gratuit' => false,
+                'prix' => 2000,
+                'id_upload_par' => 3,
+                'approuve' => true,
+                'telechargements' => 15,
                 'created_at' => now(),
             ],
             [

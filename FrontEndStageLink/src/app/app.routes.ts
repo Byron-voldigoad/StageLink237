@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { ForgotPasswordComponent } from './auth/forgot-password.component';
 import { HomeComponent } from './home.component';
 import { RegisterUserComponent } from './features/auth/register-user/register-user.component';
+import { DashboardComponent } from './modules/dashboard/dashboard.component';
 
 // Guard d'authentification
 const authGuard = () => {
@@ -32,7 +33,7 @@ export const routes: Routes = [
   {path: 'utilisateurs', canActivate: [authGuard], loadComponent: () => import('./modules/utilisateurs/utilisateurs.component').then(m => m.UtilisateursComponent) },
   { 
     path: 'dashboard', 
-    component: DashboardHomeComponent,
+    loadComponent: () => import('./modules/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
   {

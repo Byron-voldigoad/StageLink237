@@ -1,0 +1,103 @@
+<div class="bg-white rounded-xl shadow p-6 mb-6">
+  <div class="flex flex-col sm:flex-row items-start gap-6">
+    <!-- Section photo et bouton -->
+    <div class="flex flex-col items-center w-full sm:w-auto">
+      <div class="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden mb-2">
+        <img *ngIf="user?.photo" [src]="user?.photo" alt="Photo de profil" class="w-full h-full object-cover" />
+        <span *ngIf="!user?.photo" class="text-4xl text-primary font-bold">{{ user?.prenom?.charAt(0) || 'T' }}</span>
+      </div>
+      <button (click)="edit.emit()" class="mt-2 px-4 py-1 rounded bg-primary text-white hover:bg-primary-dark transition text-sm flex items-center gap-1">
+        <span class="material-icons text-base">edit</span> Modifier
+      </button>
+    </div>
+
+    <!-- Informations du tuteur -->
+    <div class="flex-1 w-full">
+      <h2 class="text-xl font-semibold mb-4">Profil Tuteur</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Colonne gauche : Informations personnelles -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-800 mb-3">Informations personnelles</h3>
+          <div class="space-y-2">
+            <div>
+              <span class="block text-gray-600 text-xs">Nom complet</span>
+              <span class="font-semibold">{{ user?.prenom }} {{ user?.nom }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Email</span>
+              <span class="font-semibold">{{ user?.email }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Téléphone</span>
+              <span class="font-semibold">{{ user?.telephone || 'Non renseigné' }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Ville</span>
+              <span class="font-semibold">{{ profilTuteur.ville || 'Non renseignée' }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Code postal</span>
+              <span class="font-semibold">{{ profilTuteur.code_postal || 'Non renseigné' }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- Colonne droite : Informations professionnelles -->
+        <div>
+          <h3 class="text-lg font-medium text-gray-800 mb-3">Informations professionnelles</h3>
+          <div class="space-y-2">
+            <div>
+              <span class="block text-gray-600 text-xs">Spécialités</span>
+              <span class="font-semibold">{{ profilTuteur.specialites || 'Non renseigné' }}</span>
+            </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Expérience</span>
+              <span class="font-semibold">{{ profilTuteur.experience_annees || '0' }} ans</span>
+            </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Tarif horaire</span>
+              <span class="font-semibold">{{ profilTuteur.tarif_horaire ? (profilTuteur.tarif_horaire | number:'1.0-0') + ' FCFA/h' : 'Non renseigné' }}</span>
+            </div>
+            <div *ngIf="profilTuteur.bio">
+              <span class="block text-gray-600 text-xs">Bio</span>
+              <span class="font-semibold">{{ profilTuteur.bio }}</span>
+          </div>
+            <div *ngIf="profilTuteur.methodes_pedagogiques">
+              <span class="block text-gray-600 text-xs">Méthodes pédagogiques</span>
+              <span class="font-semibold">{{ profilTuteur.methodes_pedagogiques }}</span>
+        </div>
+            <div *ngIf="profilTuteur.diplomes">
+              <span class="block text-gray-600 text-xs">Diplômes</span>
+              <span class="font-semibold">{{ profilTuteur.diplomes }}</span>
+      </div>
+            <div *ngIf="profilTuteur.qualifications">
+              <span class="block text-gray-600 text-xs">Qualifications</span>
+              <span class="font-semibold">{{ profilTuteur.qualifications }}</span>
+      </div>
+            <div *ngIf="profilTuteur.certifications">
+              <span class="block text-gray-600 text-xs">Certifications</span>
+              <span class="font-semibold">{{ profilTuteur.certifications }}</span>
+      </div>
+            <div>
+              <span class="block text-gray-600 text-xs">Statut</span>
+              <span class="px-2 py-1 text-sm rounded-full"
+            [ngClass]="{
+              'bg-green-100 text-green-800': profilTuteur.disponible,
+              'bg-red-100 text-red-800': !profilTuteur.disponible
+            }"
+          >
+            {{ profilTuteur.disponible ? 'Disponible' : 'Non disponible' }}
+          </span>
+        </div>
+            <div *ngIf="profilTuteur.note !== null && profilTuteur.note !== undefined">
+              <span class="block text-gray-600 text-xs">Note moyenne</span>
+              <span class="text-yellow-500 font-semibold">
+                {{ typeof profilTuteur.note === 'number' ? profilTuteur.note.toFixed(1) : profilTuteur.note }} / 5
+              </span>
+      </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

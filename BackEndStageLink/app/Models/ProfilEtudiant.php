@@ -23,7 +23,9 @@ class ProfilEtudiant extends Model
         'adresse',
         'cv_path',
         'photo_profil',
-        'credits'
+        'credits',
+        'ville',
+        'code_postal'
     ];
 
     protected $casts = [

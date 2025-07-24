@@ -20,48 +20,120 @@ class TutoratSeeder extends Seeder
      */
     public function run()
     {
-        // Récupérer quelques tuteurs existants
-        $tuteurs = ProfilTuteur::take(5)->get();
-        $etudiants = ProfilEtudiant::take(10)->get();
+        // Récupérer les données nécessaires
+        $tuteurs = ProfilTuteur::all();
+        $etudiants = ProfilEtudiant::all();
         $matieres = Matiere::all();
         $niveaux = Niveau::all();
 
-        if ($tuteurs->isEmpty()) {
-            $this->command->warn('Aucun tuteur trouvé. Créez d\'abord des tuteurs.');
+        // Vérifier les prérequis
+        if ($tuteurs->isEmpty() || $etudiants->isEmpty() || $matieres->isEmpty() || $niveaux->isEmpty()) {
+            $this->command->warn('Données manquantes. Assurez-vous d\'avoir exécuté les seeders pour les tuteurs, étudiants, matières et niveaux.');
             return;
         }
 
-        if ($matieres->isEmpty()) {
-            $this->command->warn('Aucune matière trouvée. Exécutez d\'abord le seeder des matières.');
-            return;
+        $villes = [
+            'Douala', 'Yaoundé', 'Bafoussam', 'Bamenda', 
+            'Garoua', 'Maroua', 'Buea', 'Limbé', 'Kribi'
+        ];
+
+        $methodes = [
+            'Cours particuliers avec exercices pratiques',
+            'Apprentissage par projet',
+            'Méthode interactive avec supports multimédias',
+            'Exercices progressifs et corrections détaillées',
+            'Approche pratique basée sur des cas concrets'
+        ];
+
+        // Créer des tutorats variés
+        foreach ($tuteurs as $tuteur) {
+            // Créer 2-4 tutorats par tuteur
+            $nbTutorats = rand(2, 4);
+            for ($i = 0; $i < $nbTutorats; $i++) {
+                $matiere = $matieres->random();
+                $niveau = $niveaux->random();
+                $dateDebut = now()->addDays(rand(1, 30));
+                
+                $tutorat = Tutorat::create([
+                    'titre' => $matiere->nom . ' - ' . $niveau->nom,
+                    'description' => 'Formation approfondie en ' . $matiere->nom . ' pour les étudiants de niveau ' . $niveau->nom,
+                    'domaine' => $matiere->nom,
+                    'niveau' => $niveau->nom,
+                    'date_debut' => $dateDebut,
+                    'date_fin' => $dateDebut->copy()->addMonths(rand(1, 3)),
+                    'tuteur_id' => $tuteur->id_tuteur,
+                    'localisation' => 'En ligne',
+                    'statut' => ['ouverte', 'pourvue', 'ouverte'][rand(0, 2)],
+                    'tarif_horaire' => rand(15, 50) * 1000,
+                    'duree_seance' => [60, 90, 120][array_rand([60, 90, 120])],
+                    'nombre_seances' => rand(8, 15),
+                    'prerequis' => 'Niveau ' . ($niveau->id_niveau - 1) . ' ou équivalent',
+                    'objectifs' => "Maîtriser les concepts fondamentaux\nRéussir les examens\nAcquérir une méthodologie efficace",
+                    'methode_pedagogique' => $methodes[array_rand($methodes)],
+                    'created_at' => now()
+                ]);
+
+                // Ajouter des candidatures si le tutorat est ouvert
+                if ($tutorat->statut === 'ouverte') {
+                    $nbCandidatures = rand(2, 5);
+                    $candidats = $etudiants->random($nbCandidatures);
+                    
+                    foreach ($candidats as $etudiant) {
+                        CandidatureTutorat::create([
+                            'tutorat_id' => $tutorat->id_tutorat,
+                            'etudiant_id' => $etudiant->id_etudiant,
+                            'statut' => ['en_attente', 'acceptee', 'refusee'][rand(0, 2)],
+                            'message_motivation' => 'Je souhaite participer à ce tutorat pour approfondir mes connaissances.',
+                            'cv_path' => $etudiant->cv_path ?? ('candidatures/cv/' . md5(uniqid()) . '.pdf'),
+                            'date_candidature' => now()->subDays(rand(1, 10))
+                        ]);
+                    }
+                }
+
+                // Créer des séances pour les tutorats pourvus
+                if ($tutorat->statut === 'pourvue') {
+                    $nbSeances = rand(3, 8);
+                    for ($k = 0; $k < $nbSeances; $k++) {
+                        $dateSeance = $dateDebut->copy()->addDays($k * 7); // Une séance par semaine
+                        $heureDebut = ['08:00', '10:00', '14:00', '16:00'][array_rand(['08:00', '10:00', '14:00', '16:00'])];
+                        $heureFin = date('H:i', strtotime($heureDebut) + $tutorat->duree_seance * 60);
+
+                        SeanceTutorat::create([
+                            'tutorat_id' => $tutorat->id_tutorat,
+                            'date_seance' => $dateSeance->format('Y-m-d'),
+                            'heure_debut' => $heureDebut,
+                            'heure_fin' => $heureFin,
+                            'lieu' => rand(0, 1) ? $villes[array_rand($villes)] . ' - Salle ' . rand(1, 20) : 'En ligne',
+                            'mode' => ['presentiel', 'en_ligne', 'hybride'][array_rand(['presentiel', 'en_ligne', 'hybride'])],
+                            'statut' => $dateSeance->isPast() ? 'terminee' : 'planifiee',
+                            'notes_tuteur' => rand(0, 1) ? 'Points importants discutés. Progrès satisfaisants.' : null,
+                            'materiel_requis' => rand(0, 1) ? 'Calculatrice, cahier, ordinateur portable' : null
+                        ]);
+                    }
+                }
+            }
         }
 
-        if ($niveaux->isEmpty()) {
-            $this->command->warn('Aucun niveau trouvé. Exécutez d\'abord le seeder des niveaux.');
-            return;
-        }
+        // Créer des tutorats supplémentaires pour assurer une bonne diversité
+        foreach ($matieres as $matiere) {
+            $nbTutoratsParMatiere = rand(2, 4);
+            for ($i = 0; $i < $nbTutoratsParMatiere; $i++) {
+                $tuteur = $tuteurs->random();
+                $niveau = $niveaux->random();
+                $dateDebut = now()->addDays(rand(1, 30));
+                $dateFin = $dateDebut->copy()->addMonths(rand(1, 3));
 
-        $statuts = ['ouverte', 'pourvue', 'cloturee'];
-
-        // Créer des tutorats
-        for ($i = 1; $i <= 20; $i++) {
-            $tuteur = $tuteurs->random();
-            $matiere = $matieres->random();
-            $niveau = $niveaux->random();
-            $dateDebut = now()->addDays(rand(1, 30));
-            $dateFin = $dateDebut->copy()->addDays(rand(7, 90));
-
-            $tutorat = Tutorat::create([
-                'titre' => 'Tutorat ' . $matiere->nom . ' - ' . $niveau->nom,
-                'description' => 'Description détaillée du tutorat ' . $i . '. Ce tutorat vise à améliorer les compétences des étudiants dans le domaine de ' . $matiere->nom . ' au niveau ' . $niveau->nom . '.',
-                'domaine' => $matiere->nom,
-                'niveau' => $niveau->nom,
-                'date_debut' => $dateDebut,
-                'date_fin' => $dateFin,
-                'tuteur_id' => $tuteur->id_tuteur,
-                'localisation' => rand(0, 1) ? ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Bordeaux'][array_rand(['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Bordeaux'])] : null,
-                'statut' => $statuts[array_rand($statuts)],
-                'tarif_horaire' => rand(15, 50),
+                $tutorat = Tutorat::create([
+                    'titre' => 'Tutorat ' . $matiere->nom . ' - ' . $niveau->nom,
+                    'description' => 'Description détaillée du tutorat ' . $i . '. Ce tutorat vise à améliorer les compétences des étudiants dans le domaine de ' . $matiere->nom . ' au niveau ' . $niveau->nom . '.',
+                    'domaine' => $matiere->nom,
+                    'niveau' => $niveau->nom,
+                    'date_debut' => $dateDebut,
+                    'date_fin' => $dateFin,
+                    'tuteur_id' => $tuteur->id_tuteur,
+                    'localisation' => rand(0, 1) ? $villes[array_rand($villes)] : 'En ligne',
+                    'statut' => ['ouverte', 'pourvue', 'cloturee'][array_rand(['ouverte', 'pourvue', 'cloturee'])],
+                'tarif_horaire' => rand(15, 50) * 1000,
                 'duree_seance' => [60, 90, 120][array_rand([60, 90, 120])],
                 'nombre_seances' => rand(5, 20),
                 'prerequis' => rand(0, 1) ? 'Connaissances de base requises dans le domaine de ' . $matiere->nom . '.' : null,
@@ -89,25 +161,26 @@ class TutoratSeeder extends Seeder
             if ($tutorat->statut === 'pourvue') {
                 $nbSeances = rand(3, 8);
                 for ($k = 0; $k < $nbSeances; $k++) {
-                    $dateSeance = $dateDebut->copy()->addDays(rand(0, 60));
-                    $heureDebut = ['09:00', '14:00', '16:00', '18:00'][array_rand(['09:00', '14:00', '16:00', '18:00'])];
-                    $heureFin = date('H:i', strtotime($heureDebut) + 3600); // +1 heure
+                    $dateSeance = $dateDebut->copy()->addDays($k * 7); // Une séance par semaine
+                    $heureDebut = ['08:00', '10:00', '14:00', '16:00'][array_rand(['08:00', '10:00', '14:00', '16:00'])];
+                    $heureFin = date('H:i', strtotime($heureDebut) + $tutorat->duree_seance * 60);
 
                     SeanceTutorat::create([
                         'tutorat_id' => $tutorat->id_tutorat,
                         'date_seance' => $dateSeance->format('Y-m-d'),
                         'heure_debut' => $heureDebut,
                         'heure_fin' => $heureFin,
-                        'lieu' => rand(0, 1) ? 'Salle ' . rand(1, 20) : 'En ligne',
+                        'lieu' => rand(0, 1) ? $villes[array_rand($villes)] . ' - Salle ' . rand(1, 20) : 'En ligne',
                         'mode' => ['presentiel', 'en_ligne', 'hybride'][array_rand(['presentiel', 'en_ligne', 'hybride'])],
-                        'statut' => ['planifiee', 'terminee'][array_rand(['planifiee', 'terminee'])],
+                        'statut' => $dateSeance->isPast() ? 'terminee' : 'planifiee',
                         'notes_tuteur' => rand(0, 1) ? 'Notes du tuteur pour cette séance.' : null,
                         'materiel_requis' => rand(0, 1) ? 'Calculatrice, cahier, stylos' : null
                     ]);
                 }
             }
         }
+    }
 
-        $this->command->info('Tutorats créés avec succès !');
+        $this->command->info('Tutorats créés avec succès ! Total créé : ' . Tutorat::count());
     }
 } 

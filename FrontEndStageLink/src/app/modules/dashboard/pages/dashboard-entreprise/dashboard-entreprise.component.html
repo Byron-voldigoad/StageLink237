@@ -1,0 +1,53 @@
+<div class="p-4 bg-gray-50 min-h-screen">
+  <h2 class="text-2xl font-bold mb-6">Dashboard Entreprise</h2>
+
+  <!-- Statistiques entreprise -->
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white rounded-xl shadow p-6 flex flex-col items-center">
+      <span class="material-icons text-4xl text-primary mb-2">work</span>
+      <div class="text-2xl font-bold">{{ offres.length }}</div>
+      <div class="text-gray-600">Offres publiées</div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 flex flex-col items-center">
+      <span class="material-icons text-4xl text-green-500 mb-2">assignment_ind</span>
+      <div class="text-2xl font-bold">{{ totalCandidatures }}</div>
+      <div class="text-gray-600">Candidatures reçues</div>
+    </div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="flex flex-wrap gap-4 mb-8">
+    <button class="px-4 py-2 bg-primary text-white rounded-lg" (click)="ajouterOffre()">
+      <span class="material-icons align-middle mr-1">add</span>
+      Ajouter une offre
+    </button>
+    <button class="px-4 py-2 bg-primary text-white rounded-lg" (click)="voirToutesOffres()">
+      Voir mes offres
+    </button>
+  </div>
+
+  <!-- Liste des offres de l'entreprise -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <h3 class="text-lg font-semibold mb-4">Mes offres de stage</h3>
+    <ul *ngIf="offres && offres.length > 0; else aucuneOffre">
+      <li *ngFor="let offre of offres" class="mb-4 border-b pb-2">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="font-bold">{{ offre.titre }}</div>
+            <div class="text-gray-600">{{ offre.lieu }} | {{ offre.date_debut }}</div>
+            <div class="text-gray-700 mt-1">{{ offre.description }}</div>
+          </div>
+          <div>
+            <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition" (click)="voirCandidatures(offre)">
+              <span class="material-icons align-middle mr-1">people</span>
+              {{ offre.candidatures?.length || 0 }} candidatures
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <ng-template #aucuneOffre>
+      <div class="text-gray-500 italic">Vous n'avez pas encore publié d'offre de stage.</div>
+    </ng-template>
+  </div>
+</div>

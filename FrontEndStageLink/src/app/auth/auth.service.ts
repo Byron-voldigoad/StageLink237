@@ -67,4 +67,14 @@ export class AuthService {
   registerUser(data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/utilisateurs`, data);
   }
+
+  // auth.service.ts
+  getUserRoles(): string[] {
+    const user = this.getUser();
+    return user?.roles?.map((role: any) => role.nom_role) || [];
+  }
+
+  hasRole(roleName: string): boolean {
+    return this.getUserRoles().includes(roleName);
+  }
 }

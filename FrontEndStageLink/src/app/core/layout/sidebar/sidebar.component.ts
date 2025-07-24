@@ -15,10 +15,6 @@ import { Router } from '@angular/router';
 export class SidebarComponent {
   menuItems = [
     { name: 'Dashboard', icon: 'dashboard', link: '/dashboard' },
-    { name: 'Offres de stage', icon: 'work', link: '/stages' },
-    { name: "Sujets d'examen", icon: 'book', link: '/sujets' },
-    { name: 'Tutorat', icon: 'school', link: '/tutorats' },
-    { name: 'Utilisateurs', icon: 'group', link: '/utilisateurs' },
     { name: 'Profil', icon: 'person', link: '/profil' },
     // Ajoutez d'autres liens selon vos besoins
   ];
@@ -37,13 +33,53 @@ export class SidebarComponent {
   }
 
   get filteredMenuItems() {
-    if (this.user && this.user.etudiant_id) {
-      return [
-        ...this.menuItems.slice(0, 1),
+    if (!this.user) return this.menuItems;
+
+    const baseItems = [...this.menuItems];
+    const extraItems = [];
+
+    // Étudiant
+    if (this.user.etudiant_id) {
+      extraItems.push(
         { name: 'Mes postulations', icon: 'assignment', link: '/mes-postulations' },
-        ...this.menuItems.slice(1)
-      ];
+        { name: 'Offres de stage', icon: 'work', link: '/stages' },
+        { name: 'Tutorat', icon: 'school', link: '/tutorats' },
+        { name: "Sujets d'examen", icon: 'book', link: '/sujets' }
+      );
     }
-    return this.menuItems;
+
+    // Entreprise
+    if (this.user.roles?.some((role: any) => role.nom_role === 'entreprise')) {
+      extraItems.push(
+        { name: 'Offres de stage', icon: 'work', link: '/stages' },
+        { name: 'Candidatures', icon: 'people', link: '/candidatures' }
+      );
+    }
+
+    // Tuteur
+    if (this.user.roles?.some((role: any) => role.nom_role === 'tuteur')) {
+      extraItems.push(
+        { name: 'Tutorat', icon: 'school', link: '/tutorats' },
+        { name: 'Candidatures', icon: 'people', link: '/tutorats/candidatures' }
+      );
+    }
+
+    // Admin
+    if (this.user.roles?.some((role: any) => role.nom_role === 'admin')) {
+      extraItems.push(
+        { name: 'Offres de stage', icon: 'work', link: '/stages' },
+        { name: 'Tutorat', icon: 'school', link: '/tutorats' },
+        { name: "Sujets d'examen", icon: 'book', link: '/sujets' },
+        { name: 'Utilisateurs', icon: 'group', link: '/admin/utilisateurs' },
+      );
+    }
+
+    // Insère les éléments supplémentaires après le premier item (Dashboard)
+    return [
+      ...baseItems.slice(0, 1),
+      ...extraItems,
+      ...baseItems.slice(1)
+    ];
   }
+  
 }

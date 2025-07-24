@@ -37,6 +37,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('langues', [LangueController::class, 'index']);
 Route::get('secteurs', [SecteurController::class, 'index']);
 
+// Routes pour les profils tuteurs
+Route::apiResource('profil-tuteur', \App\Http\Controllers\ProfilTuteurController::class);
+Route::get('profil-tuteur/utilisateur/{id}', [\App\Http\Controllers\ProfilTuteurController::class, 'getByUtilisateurId']);
+
+// Routes pour les profils étudiants
+Route::apiResource('profil-etudiant', \App\Http\Controllers\ProfilEtudiantController::class);
+Route::get('profil-etudiant/utilisateur/{id}', [\App\Http\Controllers\ProfilEtudiantController::class, 'getByUtilisateurId']);
+
 // Routes publiques pour les offres de stage (pour permettre l'affichage sans authentification)
 Route::get('offres-stage', [App\Http\Controllers\OffreStageController::class, 'index']);
 Route::get('offres-stage/{id}', [App\Http\Controllers\OffreStageController::class, 'show']);

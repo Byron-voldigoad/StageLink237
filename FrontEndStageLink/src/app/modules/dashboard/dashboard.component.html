@@ -1,1 +1,10 @@
-<p>dashboard works!</p>
+
+<ng-container [ngSwitch]="role">
+  <app-dashboard-admin *ngSwitchCase="'admin'"></app-dashboard-admin>
+  <app-dashboard-etudiant *ngSwitchCase="'etudiant'"></app-dashboard-etudiant>
+  <app-dashboard-entreprise *ngSwitchCase="'entreprise'"></app-dashboard-entreprise>
+  <app-dashboard-tuteur *ngSwitchCase="'tuteur'"></app-dashboard-tuteur>
+  <div *ngSwitchDefault>
+    <p>Rôle non reconnu ou non connecté.</p>
+  </div>
+</ng-container>

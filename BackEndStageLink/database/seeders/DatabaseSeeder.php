@@ -19,31 +19,129 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
-            matieresSeeder::class,
-            NiveauxSeeder::class,
-            LangueSeeder::class,
-            anneesAcademiquesSeeder::class,
-            TypesSujetsSeeder::class,
-            CorrigesExamenSeeder::class,
-            SujetsExamenSeeder::class,
-            ProfilsSeeder::class,
-            TutoratSeeder::class,
-            SecteursSeeder::class,
-            RolesAndAdminSeeder::class, // Ajout du seeder pour rôles et comptes admin/entreprise
-        ]);
-
+        // Reset foreign key checks
         DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        // Créer d'abord les tables de base et les rôles
+        $this->call([
+            RolesAndAdminSeeder::class,    // Crée les rôles et les admins
+            SecteursSeeder::class,         // Crée les secteurs d'activité
+            matieresSeeder::class,         // Crée les matières pour les tutorats
+            NiveauxSeeder::class,          // Crée les niveaux d'études
+            TypesSujetsSeeder::class,      // Crée les types de sujets d'examen
+            LangueSeeder::class,           // Crée les langues
+            anneesAcademiquesSeeder::class,// Crée les années académiques
+            // Les tables avec les données principales
+            ProfilsSeeder::class,          // Crée les tuteurs et étudiants
+            SujetsExamenSeeder::class,     // Crée les sujets d'examen
+            CorrigesExamenSeeder::class,   // Crée les corrigés
+            TutoratSeeder::class,          // Crée les tutorats et candidatures
+        ]);
         
-        // Création des entreprises
+        // Création des offres de stage
+        $offres = [
+            [
+                'id_entreprise' => 1,
+                'titre' => 'Stage Développeur Full-Stack',
+                'description' => 'Stage de développement web avec React et Laravel',
+                'exigences' => 'Connaissances en React, PHP, Laravel requises',
+                'competences_requises' => 'JavaScript, PHP, SQL, Git',
+                'duree' => '6 mois',
+                'date_debut' => '2025-09-01',
+                'date_fin' => '2026-02-28',
+                'localisation' => 'Douala, Akwa',
+                'remuneration' => 150000,
+                'secteur' => 'developpement_web',
+                'statut' => 'ouvert'
+            ],
+            [
+                'id_entreprise' => 2,
+                'titre' => 'Stage UX/UI Designer',
+                'description' => 'Stage en design d\'interface utilisateur',
+                'exigences' => 'Maîtrise de Figma et des principes de design UI/UX',
+                'competences_requises' => 'UI Design, UX Research, Prototypage',
+                'duree' => '4 mois',
+                'date_debut' => '2025-09-01',
+                'date_fin' => '2025-12-31',
+                'localisation' => 'Yaoundé, Bastos',
+                'remuneration' => 120000,
+                'secteur' => 'design_ui_ux',
+                'statut' => 'ouvert'
+            ],
+            [
+                'id_entreprise' => 3,
+                'titre' => 'Stage Data Scientist',
+                'description' => 'Stage en analyse de données et machine learning',
+                'exigences' => 'Python, statistiques, machine learning',
+                'competences_requises' => 'Python, R, SQL, TensorFlow',
+                'duree' => '6 mois',
+                'date_debut' => '2025-09-15',
+                'date_fin' => '2026-03-15',
+                'localisation' => 'Douala, Bonanjo',
+                'remuneration' => 200000,
+                'secteur' => 'data_science',
+                'statut' => 'ouvert'
+            ]
+        ];
+
+        foreach ($offres as $offre) {
+            OffreStage::create($offre);
+        }
+
+        // Création des candidatures
+        $candidatures = [
+            [
+                'id_offre_stage' => 1,
+                'id_etudiant' => 1,
+                'cv_path' => 'candidatures/cv/eZWKKuJcOLFLHXU6ddJf4ZoBeveHyphG1RongXlT.pdf',
+                'lettre_motivation_path' => 'candidatures/lettres/lettre_motivation_1.pdf',
+                'message_motivation' => 'Très intéressé par le développement web et les nouvelles technologies.',
+                'statut' => 'en_attente',
+                'postule_le' => now(),
+            ],
+            [
+                'id_offre_stage' => 2,
+                'id_etudiant' => 2,
+                'cv_path' => 'candidatures/cv/26wRrzfX5gAJvPjBu0fnvECKDm1F4A70aY6P4NPJ.pdf',
+                'lettre_motivation_path' => 'candidatures/lettres/lettre_motivation_2.pdf',
+                'message_motivation' => 'Passionné par le marketing digital et la communication.',
+                'statut' => 'examine',
+                'postule_le' => now()->subDays(5),
+            ],
+            [
+                'id_offre_stage' => 3,
+                'id_etudiant' => 3,
+                'cv_path' => 'candidatures/cv/KQMltoNy0IRggZk9rOanXvhaZaTpY4j1LdzCF0CN.pdf',
+                'lettre_motivation_path' => 'candidatures/lettres/lettre_motivation_3.pdf',
+                'message_motivation' => 'Expert en analyse de données et apprentissage automatique.',
+                'statut' => 'accepte',
+                'postule_le' => now()->subDays(10),
+            ]
+        ];
+
+        foreach ($candidatures as $candidature) {
+            DB::table('candidatures')->insert($candidature);
+        }
+
+        // Reset foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        
+        $this->command->info('Database seeding completed successfully!');
+        
+        // Création des entreprises avec leur secteurs d'activité
         $entreprises = [
             [
                 'nom' => 'Tech Solutions',
                 'adresse' => 'Carrefour Warda, Akwa, Douala',
                 'quartier' => 'Akwa',
-                'telephone' => '237 0123456789',
+                'telephone' => '+237 691234567',
                 'email' => 'contact@techsolutions.com',
                 'description' => 'Entreprise leader en solutions technologiques',
+                'secteur' => 'Développement web',
+                'site_web' => 'https://techsolutions.cm',
+                'logo_path' => 'photos/1753208226_687fd5a24ae0b.png',
+                'nif' => 'M123456789',
+                'verifie' => true,
                 'latitude' => 4.0511,
                 'longitude' => 9.7679
             ],
@@ -51,9 +149,14 @@ class DatabaseSeeder extends Seeder
                 'nom' => 'Digital Agency',
                 'adresse' => 'Boulevard de la Liberté, Bastos, Yaoundé',
                 'quartier' => 'Bastos',
-                'telephone' => '237 9876543210',
+                'telephone' => '+237 697654321',
                 'email' => 'info@digitalagency.com',
                 'description' => 'Agence de marketing digital innovante',
+                'secteur' => 'Marketing Digital',
+                'site_web' => 'https://digitalagency.cm',
+                'logo_path' => 'photos/1753206414_687fce8e0fdf5.png',
+                'nif' => 'M987654321',
+                'verifie' => true,
                 'latitude' => 3.8680,
                 'longitude' => 11.5121
             ],

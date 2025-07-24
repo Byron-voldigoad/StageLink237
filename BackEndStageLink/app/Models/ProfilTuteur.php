@@ -27,7 +27,9 @@ class ProfilTuteur extends Model
         'certifications',
         'photo_profil',
         'disponible',
-        'note'
+        'note',
+        'ville', // Ajouté
+        'code_postal' // Ajouté
     ];
 
     public function utilisateur()

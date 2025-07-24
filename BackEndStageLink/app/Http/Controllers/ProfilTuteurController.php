@@ -35,4 +35,27 @@ class ProfilTuteurController extends Controller
         ProfilTuteur::findOrFail($id)->delete();
         return response()->json(null, 204);
     }
+    
+    /**
+     * Récupère le profil tuteur par ID utilisateur
+     *
+     * @param int $id ID de l'utilisateur
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getByUtilisateurId($id)
+    {
+        $profilTuteur = ProfilTuteur::where('utilisateur_id', $id)->first();
+        
+        if (!$profilTuteur) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Profil tuteur non trouvé pour cet utilisateur'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => $profilTuteur
+        ]);
+    }
 }
